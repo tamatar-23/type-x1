@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { User, Github } from 'lucide-react';
@@ -9,6 +8,7 @@ import { ModeSelector } from '@/components/ModeSelector';
 import { StatsDisplay } from '@/components/StatsDisplay';
 import { useTypingTest } from '@/hooks/useTypingTest';
 import { TestSettings } from '@/types/typing';
+import { ThemeSelector } from '@/components/ThemeSelector';
 
 // Get saved settings or default
 const getSavedSettings = (): TestSettings => {
@@ -68,10 +68,10 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
+    <div className="min-h-screen text-foreground" style={{ backgroundColor: 'var(--theme-background, #262A33)' }}>
       {/* Header */}
       <header className="flex justify-between items-center p-6">
-        <Link to="/" className="text-2xl font-bold text-yellow-400">
+        <Link to="/" className="text-2xl font-bold" style={{ color: 'var(--theme-title, #3FFA5)' }}>
           TypeFlow
         </Link>
         <Link to="/user">
@@ -83,7 +83,7 @@ const Index = () => {
 
       {/* Main Content */}
       <main className="container mx-auto px-6 py-8">
-        <div className="max-w-6xl mx-auto space-y-8">
+        <div className="max-w-5xl mx-auto space-y-8">
           {/* Top Stats and Controls */}
           <div className="flex justify-center items-center gap-8">
             {/* Mode Selector - only show when not active and not finished */}
@@ -105,17 +105,19 @@ const Index = () => {
             )}
           </div>
 
-          {/* Typing Area */}
-          <div className="flex justify-center">
-            <TypingArea
-              text={text}
-              characters={characters}
-              currentIndex={currentIndex}
-              userInput={userInput}
-              onInput={handleInput}
-              onSpaceSkip={handleSpaceSkip}
-              isFinished={isFinished}
-            />
+          {/* Typing Area - better centered */}
+          <div className="flex justify-center px-4">
+            <div className="w-full max-w-4xl">
+              <TypingArea
+                text={text}
+                characters={characters}
+                currentIndex={currentIndex}
+                userInput={userInput}
+                onInput={handleInput}
+                onSpaceSkip={handleSpaceSkip}
+                isFinished={isFinished}
+              />
+            </div>
           </div>
 
           {/* Action Buttons - only show restart during active typing */}
@@ -139,7 +141,10 @@ const Index = () => {
         >
           <Github className="h-5 w-5" />
         </a>
-        <ThemeToggle />
+        <div className="flex items-center gap-4">
+          <ThemeSelector />
+          <ThemeToggle />
+        </div>
       </footer>
     </div>
   );
