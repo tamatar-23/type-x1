@@ -21,7 +21,6 @@ export function useTypingTest(settings: TestSettings) {
     charCount: 0
   });
   const [wpmHistory, setWpmHistory] = useState<{ time: number; wpm: number }[]>([]);
-  const [onTestComplete, setOnTestComplete] = useState<(() => void) | null>(null);
   
   const startTime = useRef<number>(0);
   const intervalRef = useRef<NodeJS.Timeout>();
@@ -71,18 +70,12 @@ export function useTypingTest(settings: TestSettings) {
   }, []);
 
   const finishTest = useCallback(() => {
+    console.log('Finishing test...');
     setIsFinished(true);
     setIsActive(false);
     if (intervalRef.current) clearInterval(intervalRef.current);
-    if (wpmIntervalRef.current) clearInterval(wpmIntervalRef.current);
-    
-    // Auto-navigate to results after a short delay
-    setTimeout(() => {
-      if (onTestComplete) {
-        onTestComplete();
-      }
-    }, 500);
-  }, [onTestComplete]);
+    if (wpmIntervalRef.current) clearInterval(wmpIntervalRef.current);
+  }, []);
 
   const startTest = useCallback(() => {
     if (!isActive) {
@@ -121,7 +114,7 @@ export function useTypingTest(settings: TestSettings) {
     const newCharacters = [...characters];
     const inputLength = input.length;
     
-    // Update character statuses
+    // Update character statuses - don't mark as incorrect if input is shorter
     for (let i = 0; i < newCharacters.length; i++) {
       if (i < inputLength) {
         newCharacters[i].status = input[i] === text[i] ? 'correct' : 'incorrect';
@@ -151,18 +144,16 @@ export function useTypingTest(settings: TestSettings) {
   }, [initializeTest]);
 
   const getResult = useCallback((): TestResult => {
-    return {
+    const result = {
       id: Date.now().toString(),
       timestamp: new Date(),
       settings,
       wpmHistory,
       ...stats
     };
+    console.log('Generated result:', result);
+    return result;
   }, [settings, stats, wpmHistory]);
-
-  const setTestCompleteCallback = useCallback((callback: () => void) => {
-    setOnTestComplete(() => callback);
-  }, []);
 
   useEffect(() => {
     initializeTest();
@@ -187,7 +178,6 @@ export function useTypingTest(settings: TestSettings) {
     wpmHistory,
     handleInput,
     resetTest,
-    getResult,
-    setTestCompleteCallback
+    getResult
   };
 }

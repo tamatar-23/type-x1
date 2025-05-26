@@ -11,16 +11,30 @@ const Results = () => {
   const [result, setResult] = useState<TestResult | null>(null);
 
   useEffect(() => {
+    console.log('Results page loaded');
     const storedResult = sessionStorage.getItem('lastResult');
+    console.log('Stored result:', storedResult);
     if (storedResult) {
-      setResult(JSON.parse(storedResult));
+      try {
+        const parsedResult = JSON.parse(storedResult);
+        console.log('Parsed result:', parsedResult);
+        setResult(parsedResult);
+      } catch (error) {
+        console.error('Error parsing result:', error);
+        navigate('/');
+      }
     } else {
+      console.log('No stored result found, redirecting to home');
       navigate('/');
     }
   }, [navigate]);
 
   if (!result) {
-    return <div>Loading...</div>;
+    return (
+      <div className="min-h-screen bg-background text-foreground flex items-center justify-center">
+        <div>Loading results...</div>
+      </div>
+    );
   }
 
   const retryTest = () => {
@@ -64,7 +78,6 @@ const Results = () => {
               <div className="text-white">
                 {result.settings.mode === 'time' ? `time ${result.settings.duration}` : `words ${result.settings.duration}`}
               </div>
-              <div className="text-white">{result.settings.difficulty}</div>
             </div>
             
             <div className="text-center">
@@ -89,7 +102,7 @@ const Results = () => {
           </div>
 
           {/* WPM Chart */}
-          {result.wpmHistory.length > 1 && (
+          {result.wpmHistory && result.wpmHistory.length > 1 && (
             <div className="bg-gray-900/50 rounded-lg p-6">
               <div className="h-[300px]">
                 <ResponsiveContainer width="100%" height="100%">

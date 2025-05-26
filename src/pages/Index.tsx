@@ -29,22 +29,25 @@ const Index = () => {
     stats,
     handleInput,
     resetTest,
-    getResult,
-    setTestCompleteCallback
+    getResult
   } = useTypingTest(settings);
 
   const handleViewResults = () => {
     const result = getResult();
+    console.log('Storing result:', result);
     sessionStorage.setItem('lastResult', JSON.stringify(result));
     navigate('/results');
   };
 
-  // Set up auto-navigation when test completes
+  // Handle test completion
   useEffect(() => {
-    setTestCompleteCallback(() => {
-      handleViewResults();
-    });
-  }, [setTestCompleteCallback]);
+    if (isFinished) {
+      console.log('Test finished, navigating to results');
+      setTimeout(() => {
+        handleViewResults();
+      }, 1000);
+    }
+  }, [isFinished]);
 
   const handleRestart = () => {
     resetTest();
@@ -104,7 +107,7 @@ const Index = () => {
           {isActive && !isFinished && (
             <div className="flex justify-center">
               <Button onClick={handleRestart} variant="outline" className="bg-transparent border-gray-600 text-gray-400 hover:text-white hover:border-white">
-                Restart (Tab + Enter)
+                Restart (Tab)
               </Button>
             </div>
           )}

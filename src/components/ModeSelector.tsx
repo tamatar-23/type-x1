@@ -13,24 +13,30 @@ export function ModeSelector({ settings, onSettingsChange, disabled }: ModeSelec
   const wordOptions = [10, 50, 100];
 
   return (
-    <div className="flex flex-col gap-6 items-center">
-      <div className="flex items-center gap-4">
+    <div className="flex items-center gap-6">
+      {/* Mode Toggle */}
+      <div className="flex items-center gap-2 bg-muted rounded-lg p-1">
         <Button
-          variant={settings.mode === 'time' ? 'default' : 'outline'}
+          variant={settings.mode === 'time' ? 'default' : 'ghost'}
+          size="sm"
           onClick={() => onSettingsChange({ ...settings, mode: 'time', duration: 30 })}
           disabled={disabled}
+          className="px-4"
         >
           Time
         </Button>
         <Button
-          variant={settings.mode === 'words' ? 'default' : 'outline'}
+          variant={settings.mode === 'words' ? 'default' : 'ghost'}
+          size="sm"
           onClick={() => onSettingsChange({ ...settings, mode: 'words', duration: 50 })}
           disabled={disabled}
+          className="px-4"
         >
           Words
         </Button>
       </div>
 
+      {/* Duration Options */}
       <div className="flex items-center gap-2 bg-muted rounded-lg p-1">
         {settings.mode === 'time' ? (
           timeOptions.map((time) => (
@@ -40,7 +46,7 @@ export function ModeSelector({ settings, onSettingsChange, disabled }: ModeSelec
               size="sm"
               onClick={() => onSettingsChange({ ...settings, duration: time })}
               disabled={disabled}
-              className="px-6"
+              className="px-4"
             >
               {time}s
             </Button>
@@ -53,31 +59,12 @@ export function ModeSelector({ settings, onSettingsChange, disabled }: ModeSelec
               size="sm"
               onClick={() => onSettingsChange({ ...settings, duration: words })}
               disabled={disabled}
-              className="px-6"
+              className="px-4"
             >
               {words}
             </Button>
           ))
         )}
-      </div>
-
-      <div className="flex items-center gap-2">
-        <Button
-          variant={settings.difficulty === 'easy' ? 'default' : 'outline'}
-          size="sm"
-          onClick={() => onSettingsChange({ ...settings, difficulty: 'easy' })}
-          disabled={disabled}
-        >
-          Easy
-        </Button>
-        <Button
-          variant={settings.difficulty === 'hard' ? 'default' : 'outline'}
-          size="sm"
-          onClick={() => onSettingsChange({ ...settings, difficulty: 'hard' })}
-          disabled={disabled}
-        >
-          Hard
-        </Button>
       </div>
     </div>
   );
