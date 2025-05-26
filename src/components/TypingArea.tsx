@@ -1,5 +1,6 @@
 
-import { useRef, useEffect } from 'react';
+import { useRef, useEffect, useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Character } from '@/types/typing';
 
 interface TypingAreaProps {
@@ -8,11 +9,21 @@ interface TypingAreaProps {
   currentIndex: number;
   userInput: string;
   onInput: (value: string) => void;
+  onSpaceSkip: (currentIndex: number) => void;
   isFinished: boolean;
 }
 
-export function TypingArea({ text, characters, currentIndex, userInput, onInput, isFinished }: TypingAreaProps) {
+export function TypingArea({ 
+  text, 
+  characters, 
+  currentIndex, 
+  userInput, 
+  onInput, 
+  onSpaceSkip,
+  isFinished 
+}: TypingAreaProps) {
   const inputRef = useRef<HTMLInputElement>(null);
+  const [currentLineIndex, setCurrentLineIndex] = useState(0);
 
   useEffect(() => {
     if (inputRef.current && !isFinished) {
@@ -22,7 +33,7 @@ export function TypingArea({ text, characters, currentIndex, userInput, onInput,
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Tab' && e.shiftKey === false) {
+      if (e.key === 'Tab' && !e.shiftKey) {
         e.preventDefault();
         window.location.reload();
       }
@@ -34,35 +45,26 @@ export function TypingArea({ text, characters, currentIndex, userInput, onInput,
       
       if (e.key === ' ') {
         e.preventDefault();
-        // Only allow space if we're at the end of a word
+        
+        // Check if we're in the middle of a word
         const currentChar = text[currentIndex];
         if (currentChar === ' ') {
-          // We're already at a space, move to next character
+          // We're at a space, just add it normally
           const newInput = userInput + ' ';
           onInput(newInput);
         } else {
-          // Find the next space and move there
-          const nextSpaceIndex = text.indexOf(' ', currentIndex);
-          if (nextSpaceIndex !== -1) {
-            const skippedText = text.slice(currentIndex, nextSpaceIndex);
-            const newInput = userInput + skippedText + ' ';
-            onInput(newInput);
-          }
+          // We're in the middle of a word, skip to end and mark as incorrect
+          onSpaceSkip(currentIndex);
         }
       }
     };
 
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [currentIndex, text, userInput, onInput]);
+  }, [currentIndex, text, userInput, onInput, onSpaceSkip]);
 
   const getCharStyle = (char: Character, index: number) => {
     let baseStyle = "relative text-2xl font-mono font-medium";
-    
-    if (index === currentIndex) {
-      // Current character should be grey (untyped) and not blink
-      return `${baseStyle} text-gray-500`;
-    }
     
     switch (char.status) {
       case 'correct':
@@ -76,41 +78,46 @@ export function TypingArea({ text, characters, currentIndex, userInput, onInput,
     }
   };
 
-  // Split text into words for proper wrapping
+  // Split text into words and organize into lines
   const words = text.split(' ');
-  let charIndex = 0;
-  const linesOfWords: string[][] = [];
   const wordsPerLine = 12;
+  const lines: string[][] = [];
   
   for (let i = 0; i < words.length; i += wordsPerLine) {
-    linesOfWords.push(words.slice(i, i + wordsPerLine));
+    lines.push(words.slice(i, i + wordsPerLine));
   }
 
   // Find which line contains the current position
-  let currentLineIndex = 0;
-  let totalChars = 0;
+  let charCount = 0;
+  let targetLineIndex = 0;
   
-  for (let lineIndex = 0; lineIndex < linesOfWords.length; lineIndex++) {
-    const lineText = linesOfWords[lineIndex].join(' ') + (lineIndex < linesOfWords.length - 1 ? ' ' : '');
-    if (totalChars + lineText.length > currentIndex) {
-      currentLineIndex = lineIndex;
+  for (let lineIndex = 0; lineIndex < lines.length; lineIndex++) {
+    const lineText = lines[lineIndex].join(' ') + (lineIndex < lines.length - 1 ? ' ' : '');
+    if (charCount + lineText.length > currentIndex) {
+      targetLineIndex = lineIndex;
       break;
     }
-    totalChars += lineText.length;
+    charCount += lineText.length;
   }
 
-  // Show 3 lines centered around current line
-  const startLine = Math.max(0, currentLineIndex);
-  const visibleLines = linesOfWords.slice(startLine, startLine + 3);
-  const visibleText = visibleLines.map(line => line.join(' ')).join(' ');
+  // Update current line index for smooth transitions
+  useEffect(() => {
+    if (targetLineIndex !== currentLineIndex) {
+      setCurrentLineIndex(targetLineIndex);
+    }
+  }, [targetLineIndex, currentLineIndex]);
+
+  // Show 3 lines at a time
+  const visibleLines = lines.slice(currentLineIndex, currentLineIndex + 3);
   
-  // Calculate the start index for visible text
+  // Calculate visible text and character indices
   let visibleStartIndex = 0;
-  for (let i = 0; i < startLine; i++) {
-    visibleStartIndex += linesOfWords[i].join(' ').length + (i < linesOfWords.length - 1 ? 1 : 0);
+  for (let i = 0; i < currentLineIndex; i++) {
+    const lineText = lines[i].join(' ') + (i < lines.length - 1 ? ' ' : '');
+    visibleStartIndex += lineText.length;
   }
 
-  const adjustedCurrentIndex = Math.max(0, currentIndex - visibleStartIndex);
+  const visibleText = visibleLines.map(line => line.join(' ')).join(' ');
   const visibleCharacters = characters.slice(visibleStartIndex, visibleStartIndex + visibleText.length);
 
   return (
@@ -129,27 +136,75 @@ export function TypingArea({ text, characters, currentIndex, userInput, onInput,
       />
       
       <div 
-        className="font-mono text-2xl leading-relaxed p-8 min-h-[300px] cursor-text focus-within:outline-none"
+        className="font-mono text-2xl leading-relaxed p-8 min-h-[200px] cursor-text focus-within:outline-none"
         onClick={() => inputRef.current?.focus()}
       >
-        <div className="flex flex-wrap overflow-hidden" style={{ height: '200px' }}>
-          {visibleCharacters.map((char, index) => (
-            <span
-              key={index + visibleStartIndex}
-              className={`${getCharStyle(char, index + visibleStartIndex)} ${
-                index + visibleStartIndex === currentIndex ? 'relative' : ''
-              }`}
-            >
-              {char.char === ' ' ? '\u00A0' : char.char}
-              {index + visibleStartIndex === currentIndex && (
-                <span className="absolute top-0 left-0 w-0.5 h-full bg-yellow-400 animate-pulse"></span>
-              )}
-            </span>
-          ))}
-          {adjustedCurrentIndex === visibleCharacters.length && (
-            <span className="w-0.5 h-6 bg-yellow-400 animate-pulse"></span>
-          )}
-        </div>
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={currentLineIndex}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            transition={{ duration: 0.3, ease: "easeInOut" }}
+            className="overflow-hidden"
+            style={{ height: '150px' }}
+          >
+            {visibleLines.map((line, lineIdx) => (
+              <div key={currentLineIndex + lineIdx} className="flex flex-wrap mb-2">
+                {line.map((word, wordIdx) => {
+                  // Calculate start index for this word
+                  let wordStartIndex = visibleStartIndex;
+                  for (let i = 0; i < lineIdx; i++) {
+                    wordStartIndex += visibleLines[i].join(' ').length + 1;
+                  }
+                  for (let i = 0; i < wordIdx; i++) {
+                    wordStartIndex += line[i].length + 1;
+                  }
+                  
+                  return (
+                    <span key={`${lineIdx}-${wordIdx}`} className="mr-4">
+                      {word.split('').map((char, charIdx) => {
+                        const globalIndex = wordStartIndex + charIdx;
+                        const character = visibleCharacters[globalIndex - visibleStartIndex];
+                        if (!character) return null;
+                        
+                        return (
+                          <span
+                            key={globalIndex}
+                            className={`${getCharStyle(character, globalIndex)} ${
+                              globalIndex === currentIndex ? 'relative' : ''
+                            }`}
+                          >
+                            {char}
+                            {globalIndex === currentIndex && (
+                              <span className="absolute top-0 left-0 w-0.5 h-6 bg-yellow-400 animate-pulse"></span>
+                            )}
+                          </span>
+                        );
+                      })}
+                      {/* Add space character */}
+                      {wordIdx < line.length - 1 || lineIdx < visibleLines.length - 1 ? (
+                        <span
+                          className={`${getCharStyle(
+                            visibleCharacters[wordStartIndex + word.length - visibleStartIndex] || { char: ' ', status: 'pending' },
+                            wordStartIndex + word.length
+                          )} ${
+                            wordStartIndex + word.length === currentIndex ? 'relative' : ''
+                          }`}
+                        >
+                          {'\u00A0'}
+                          {wordStartIndex + word.length === currentIndex && (
+                            <span className="absolute top-0 left-0 w-0.5 h-6 bg-yellow-400 animate-pulse"></span>
+                          )}
+                        </span>
+                      ) : null}
+                    </span>
+                  );
+                })}
+              </div>
+            ))}
+          </motion.div>
+        </AnimatePresence>
       </div>
     </div>
   );

@@ -10,13 +10,26 @@ import { StatsDisplay } from '@/components/StatsDisplay';
 import { useTypingTest } from '@/hooks/useTypingTest';
 import { TestSettings } from '@/types/typing';
 
-const Index = () => {
-  const navigate = useNavigate();
-  const [settings, setSettings] = useState<TestSettings>({
+// Get saved settings or default
+const getSavedSettings = (): TestSettings => {
+  const saved = localStorage.getItem('typeflow-settings');
+  if (saved) {
+    try {
+      return JSON.parse(saved);
+    } catch {
+      // Fall back to default if parsing fails
+    }
+  }
+  return {
     mode: 'time',
     duration: 30,
     difficulty: 'easy'
-  });
+  };
+};
+
+const Index = () => {
+  const navigate = useNavigate();
+  const [settings, setSettings] = useState<TestSettings>(getSavedSettings());
 
   const {
     text,
@@ -28,6 +41,7 @@ const Index = () => {
     timeLeft,
     stats,
     handleInput,
+    handleSpaceSkip,
     resetTest,
     getResult
   } = useTypingTest(settings);
@@ -99,6 +113,7 @@ const Index = () => {
               currentIndex={currentIndex}
               userInput={userInput}
               onInput={handleInput}
+              onSpaceSkip={handleSpaceSkip}
               isFinished={isFinished}
             />
           </div>

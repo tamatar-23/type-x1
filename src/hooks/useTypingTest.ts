@@ -2,6 +2,23 @@ import { useState, useCallback, useEffect, useRef } from 'react';
 import { TestSettings, TypingStats, Character, TestResult } from '@/types/typing';
 import { generateText } from '@/utils/words';
 
+// Get saved settings or default
+const getSavedSettings = (): TestSettings => {
+  const saved = localStorage.getItem('typeflow-settings');
+  if (saved) {
+    try {
+      return JSON.parse(saved);
+    } catch {
+      // Fall back to default if parsing fails
+    }
+  }
+  return {
+    mode: 'time',
+    duration: 30,
+    difficulty: 'easy'
+  };
+};
+
 export function useTypingTest(settings: TestSettings) {
   const [text, setText] = useState('');
   const [userInput, setUserInput] = useState('');
@@ -24,6 +41,11 @@ export function useTypingTest(settings: TestSettings) {
   const startTime = useRef<number>(0);
   const intervalRef = useRef<NodeJS.Timeout>();
   const wpmIntervalRef = useRef<NodeJS.Timeout>();
+
+  // Save settings whenever they change
+  useEffect(() => {
+    localStorage.setItem('typeflow-settings', JSON.stringify(settings));
+  }, [settings]);
 
   const initializeTest = useCallback(() => {
     const wordCount = settings.mode === 'words' ? settings.duration : 200;
@@ -113,7 +135,7 @@ export function useTypingTest(settings: TestSettings) {
     const newCharacters = [...characters];
     const inputLength = input.length;
     
-    // Update character statuses - don't mark as incorrect if input is shorter
+    // Update character statuses
     for (let i = 0; i < newCharacters.length; i++) {
       if (i < inputLength) {
         newCharacters[i].status = input[i] === text[i] ? 'correct' : 'incorrect';
@@ -135,6 +157,32 @@ export function useTypingTest(settings: TestSettings) {
       finishTest();
     }
   }, [isFinished, isActive, characters, text, settings.mode, startTest, calculateStats, finishTest]);
+
+  const handleSpaceSkip = useCallback((currentPos: number) => {
+    // Find the current word boundaries
+    const textBeforeCursor = text.slice(0, currentPos);
+    const textFromCursor = text.slice(currentPos);
+    
+    // Find the end of current word (next space or end of text)
+    const nextSpaceIndex = textFromCursor.indexOf(' ');
+    const endOfWord = nextSpaceIndex === -1 ? text.length : currentPos + nextSpaceIndex;
+    
+    // Mark skipped characters as incorrect
+    const newCharacters = [...characters];
+    for (let i = currentPos; i < endOfWord; i++) {
+      newCharacters[i].status = 'incorrect';
+    }
+    
+    // Add the space if we're not at the end
+    if (endOfWord < text.length) {
+      newCharacters[endOfWord].status = 'correct'; // Mark the space as correct
+      const newInput = userInput + text.slice(currentPos, endOfWord + 1);
+      setUserInput(newInput);
+      setCurrentIndex(endOfWord + 1);
+    }
+    
+    setCharacters(newCharacters);
+  }, [text, characters, userInput]);
 
   const resetTest = useCallback(() => {
     if (intervalRef.current) clearInterval(intervalRef.current);
@@ -176,6 +224,7 @@ export function useTypingTest(settings: TestSettings) {
     stats,
     wpmHistory,
     handleInput,
+    handleSpaceSkip,
     resetTest,
     getResult
   };
