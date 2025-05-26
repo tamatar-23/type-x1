@@ -24,9 +24,14 @@ export function TypingArea({ text, characters, currentIndex, userInput, onInput,
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Tab') {
         e.preventDefault();
-        if (e.key === 'Enter' || (e.key === 'Tab' && e.shiftKey === false)) {
+        if (e.shiftKey === false) {
           window.location.reload();
         }
+      }
+      
+      if (e.key === 'Enter' && e.getModifierState && e.getModifierState('Tab')) {
+        e.preventDefault();
+        window.location.reload();
       }
       
       if (e.key === ' ') {
