@@ -1,4 +1,3 @@
-
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { TestSettings, TypingStats, Character, TestResult } from '@/types/typing';
 import { generateText } from '@/utils/words';
@@ -74,7 +73,7 @@ export function useTypingTest(settings: TestSettings) {
     setIsFinished(true);
     setIsActive(false);
     if (intervalRef.current) clearInterval(intervalRef.current);
-    if (wpmIntervalRef.current) clearInterval(wmpIntervalRef.current);
+    if (wpmIntervalRef.current) clearInterval(wpmIntervalRef.current);
   }, []);
 
   const startTest = useCallback(() => {
