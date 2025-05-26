@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { User, Github } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -29,25 +29,32 @@ const Index = () => {
     stats,
     handleInput,
     resetTest,
-    getResult
+    getResult,
+    setTestCompleteCallback
   } = useTypingTest(settings);
+
+  const handleViewResults = () => {
+    const result = getResult();
+    sessionStorage.setItem('lastResult', JSON.stringify(result));
+    navigate('/results');
+  };
+
+  // Set up auto-navigation when test completes
+  useEffect(() => {
+    setTestCompleteCallback(() => {
+      handleViewResults();
+    });
+  }, [setTestCompleteCallback]);
 
   const handleRestart = () => {
     resetTest();
   };
 
-  const handleViewResults = () => {
-    const result = getResult();
-    // Store result in sessionStorage for the results page
-    sessionStorage.setItem('lastResult', JSON.stringify(result));
-    navigate('/results');
-  };
-
   return (
     <div className="min-h-screen bg-background text-foreground">
       {/* Header */}
-      <header className="flex justify-between items-center p-6 border-b border-border">
-        <Link to="/" className="text-2xl font-bold">
+      <header className="flex justify-between items-center p-6">
+        <Link to="/" className="text-2xl font-bold text-yellow-400">
           TypeFlow
         </Link>
         <Link to="/user">
@@ -58,52 +65,46 @@ const Index = () => {
       </header>
 
       {/* Main Content */}
-      <main className="container mx-auto px-6 py-12">
-        <div className="max-w-6xl mx-auto space-y-12">
-          {/* Mode Selector */}
-          {!isActive && !isFinished && (
-            <ModeSelector
-              settings={settings}
-              onSettingsChange={setSettings}
-              disabled={isActive}
-            />
-          )}
+      <main className="container mx-auto px-6 py-8">
+        <div className="max-w-6xl mx-auto space-y-8">
+          {/* Top Stats and Controls */}
+          <div className="flex justify-center items-center gap-8">
+            {/* Mode Selector - only show when not active and not finished */}
+            {!isActive && !isFinished && (
+              <ModeSelector
+                settings={settings}
+                onSettingsChange={setSettings}
+                disabled={isActive}
+              />
+            )}
 
-          {/* Stats Display */}
-          {(isActive || isFinished) && (
-            <StatsDisplay
-              stats={stats}
-              timeLeft={timeLeft}
-              mode={settings.mode}
-            />
-          )}
+            {/* Stats Display - show when active or finished */}
+            {(isActive || isFinished) && (
+              <StatsDisplay
+                stats={stats}
+                timeLeft={timeLeft}
+                mode={settings.mode}
+              />
+            )}
+          </div>
 
           {/* Typing Area */}
-          <TypingArea
-            text={text}
-            characters={characters}
-            currentIndex={currentIndex}
-            userInput={userInput}
-            onInput={handleInput}
-            isFinished={isFinished}
-          />
+          <div className="flex justify-center">
+            <TypingArea
+              text={text}
+              characters={characters}
+              currentIndex={currentIndex}
+              userInput={userInput}
+              onInput={handleInput}
+              isFinished={isFinished}
+            />
+          </div>
 
-          {/* Action Buttons */}
-          {isFinished && (
-            <div className="flex justify-center gap-4">
-              <Button onClick={handleRestart} variant="outline">
-                Try Again
-              </Button>
-              <Button onClick={handleViewResults}>
-                View Results
-              </Button>
-            </div>
-          )}
-
-          {(isActive || isFinished) && !isFinished && (
+          {/* Action Buttons - only show restart during active typing */}
+          {isActive && !isFinished && (
             <div className="flex justify-center">
-              <Button onClick={handleRestart} variant="outline">
-                Restart
+              <Button onClick={handleRestart} variant="outline" className="bg-transparent border-gray-600 text-gray-400 hover:text-white hover:border-white">
+                Restart (Tab + Enter)
               </Button>
             </div>
           )}

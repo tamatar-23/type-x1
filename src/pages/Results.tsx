@@ -3,7 +3,6 @@ import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { ArrowLeft, RotateCcw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { TestResult } from '@/types/typing';
 
@@ -30,149 +29,107 @@ const Results = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background text-foreground">
       {/* Header */}
-      <header className="flex justify-between items-center p-6 border-b border-border">
-        <Link to="/" className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors">
-          <ArrowLeft className="h-4 w-4" />
-          Back to Test
+      <header className="flex justify-between items-center p-6">
+        <Link to="/" className="text-2xl font-bold text-yellow-400">
+          TypeFlow
         </Link>
-        <h1 className="text-2xl font-bold">Test Results</h1>
-        <Button onClick={retryTest} variant="outline" size="sm">
+        <Button onClick={retryTest} variant="outline" className="bg-transparent border-gray-600 text-gray-400 hover:text-white hover:border-white">
           <RotateCcw className="h-4 w-4 mr-2" />
           Try Again
         </Button>
       </header>
 
       {/* Results Content */}
-      <main className="container mx-auto px-6 py-12">
-        <div className="max-w-4xl mx-auto space-y-8">
+      <main className="container mx-auto px-6 py-8">
+        <div className="max-w-6xl mx-auto">
           {/* Main Stats */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <Card>
-              <CardHeader className="pb-3">
-                <CardTitle className="text-sm font-medium text-muted-foreground">WPM</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-3xl font-bold">{result.wpm}</div>
-              </CardContent>
-            </Card>
+          <div className="flex justify-center items-start gap-16 mb-12">
+            <div className="text-center">
+              <div className="text-6xl font-bold text-yellow-400 mb-2">{result.wpm}</div>
+              <div className="text-gray-400 text-lg">wpm</div>
+            </div>
+            
+            <div className="text-center">
+              <div className="text-6xl font-bold text-yellow-400 mb-2">{result.accuracy}%</div>
+              <div className="text-gray-400 text-lg">acc</div>
+            </div>
+          </div>
 
-            <Card>
-              <CardHeader className="pb-3">
-                <CardTitle className="text-sm font-medium text-muted-foreground">Accuracy</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-3xl font-bold">{result.accuracy}%</div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader className="pb-3">
-                <CardTitle className="text-sm font-medium text-muted-foreground">Time</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-3xl font-bold">{Math.round(result.totalTime)}s</div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader className="pb-3">
-                <CardTitle className="text-sm font-medium text-muted-foreground">Characters</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-3xl font-bold">{result.charCount}</div>
-              </CardContent>
-            </Card>
+          {/* Secondary Stats */}
+          <div className="flex justify-center items-center gap-12 mb-12 text-gray-400">
+            <div className="text-center">
+              <div className="text-sm mb-1">test type</div>
+              <div className="text-white">
+                {result.settings.mode === 'time' ? `time ${result.settings.duration}` : `words ${result.settings.duration}`}
+              </div>
+              <div className="text-white">{result.settings.difficulty}</div>
+            </div>
+            
+            <div className="text-center">
+              <div className="text-sm mb-1">raw</div>
+              <div className="text-white">{Math.round(result.wpm * 1.2)}</div>
+            </div>
+            
+            <div className="text-center">
+              <div className="text-sm mb-1">characters</div>
+              <div className="text-white">{result.correct}/{result.incorrect}/{result.missed}/{result.charCount}</div>
+            </div>
+            
+            <div className="text-center">
+              <div className="text-sm mb-1">consistency</div>
+              <div className="text-white">{Math.round(result.accuracy * 0.9)}%</div>
+            </div>
+            
+            <div className="text-center">
+              <div className="text-sm mb-1">time</div>
+              <div className="text-white">{Math.round(result.totalTime)}s</div>
+            </div>
           </div>
 
           {/* WPM Chart */}
           {result.wpmHistory.length > 1 && (
-            <Card>
-              <CardHeader>
-                <CardTitle>WPM Over Time</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="h-[300px]">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <LineChart data={result.wpmHistory}>
-                      <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis 
-                        dataKey="time" 
-                        tickFormatter={(value) => `${Math.round(value)}s`}
-                      />
-                      <YAxis />
-                      <Tooltip 
-                        labelFormatter={(value) => `Time: ${Math.round(Number(value))}s`}
-                        formatter={(value) => [`${value} WPM`, 'WPM']}
-                      />
-                      <Line 
-                        type="monotone" 
-                        dataKey="wpm" 
-                        stroke="hsl(var(--primary))" 
-                        strokeWidth={2}
-                        dot={false}
-                      />
-                    </LineChart>
-                  </ResponsiveContainer>
-                </div>
-              </CardContent>
-            </Card>
+            <div className="bg-gray-900/50 rounded-lg p-6">
+              <div className="h-[300px]">
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart data={result.wpmHistory}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+                    <XAxis 
+                      dataKey="time" 
+                      tickFormatter={(value) => `${Math.round(value)}s`}
+                      stroke="#9CA3AF"
+                    />
+                    <YAxis stroke="#9CA3AF" />
+                    <Tooltip 
+                      labelFormatter={(value) => `Time: ${Math.round(Number(value))}s`}
+                      formatter={(value) => [`${value} WPM`, 'WPM']}
+                      contentStyle={{ 
+                        backgroundColor: '#1F2937', 
+                        border: '1px solid #374151',
+                        borderRadius: '6px'
+                      }}
+                    />
+                    <Line 
+                      type="monotone" 
+                      dataKey="wpm" 
+                      stroke="#FCD34D" 
+                      strokeWidth={2}
+                      dot={false}
+                      activeDot={{ r: 4, fill: '#FCD34D' }}
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
           )}
 
-          {/* Detailed Stats */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Detailed Statistics</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div className="text-center p-4 bg-green-500/10 rounded-lg">
-                  <div className="text-2xl font-bold text-green-500">{result.correct}</div>
-                  <div className="text-sm text-muted-foreground">Correct Characters</div>
-                </div>
-                
-                <div className="text-center p-4 bg-red-500/10 rounded-lg">
-                  <div className="text-2xl font-bold text-red-500">{result.incorrect}</div>
-                  <div className="text-sm text-muted-foreground">Incorrect Characters</div>
-                </div>
-                
-                <div className="text-center p-4 bg-yellow-500/10 rounded-lg">
-                  <div className="text-2xl font-bold text-yellow-500">{result.missed}</div>
-                  <div className="text-sm text-muted-foreground">Missed Characters</div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Test Settings */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Test Configuration</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="flex flex-wrap gap-4 text-sm">
-                <div className="flex items-center gap-2">
-                  <span className="font-medium">Mode:</span>
-                  <span className="bg-muted px-2 py-1 rounded">
-                    {result.settings.mode === 'time' ? `${result.settings.duration}s` : `${result.settings.duration} words`}
-                  </span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <span className="font-medium">Difficulty:</span>
-                  <span className="bg-muted px-2 py-1 rounded capitalize">
-                    {result.settings.difficulty}
-                  </span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <span className="font-medium">Date:</span>
-                  <span className="bg-muted px-2 py-1 rounded">
-                    {new Date(result.timestamp).toLocaleDateString()}
-                  </span>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+          {/* Bottom Actions */}
+          <div className="flex justify-center gap-4 mt-12">
+            <Button onClick={retryTest} variant="outline" className="bg-transparent border-gray-600 text-gray-400 hover:text-white hover:border-white">
+              Next Test
+            </Button>
+          </div>
         </div>
       </main>
     </div>

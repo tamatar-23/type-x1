@@ -20,23 +20,58 @@ export function TypingArea({ text, characters, currentIndex, userInput, onInput,
     }
   }, [isFinished]);
 
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Tab') {
+        e.preventDefault();
+        if (e.key === 'Enter' || (e.key === 'Tab' && e.shiftKey === false)) {
+          window.location.reload();
+        }
+      }
+      
+      if (e.key === ' ') {
+        e.preventDefault();
+        // Find the next space character and move cursor there
+        const nextSpaceIndex = text.indexOf(' ', currentIndex);
+        if (nextSpaceIndex !== -1) {
+          const newInput = userInput + text.slice(currentIndex, nextSpaceIndex + 1);
+          onInput(newInput);
+        }
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [currentIndex, text, userInput, onInput]);
+
   const getCharStyle = (char: Character, index: number) => {
-    const baseStyle = "relative";
+    let baseStyle = "relative text-2xl font-atkinson font-medium";
     
     switch (char.status) {
       case 'correct':
-        return `${baseStyle} text-green-500`;
+        return `${baseStyle} text-white`;
       case 'incorrect':
         return `${baseStyle} text-red-500 bg-red-500/20`;
       case 'missed':
-        return `${baseStyle} text-muted-foreground`;
+        return `${baseStyle} text-gray-500`;
       default:
-        return `${baseStyle} text-muted-foreground`;
+        return `${baseStyle} text-gray-500`;
     }
   };
 
+  // Split text into lines for 3-line display
+  const words = text.split(' ');
+  const currentWordIndex = text.slice(0, currentIndex).split(' ').length - 1;
+  const wordsPerLine = 15; // Approximate words per line
+  const currentLineStart = Math.floor(currentWordIndex / wordsPerLine) * wordsPerLine;
+  const visibleWords = words.slice(currentLineStart, currentLineStart + wordsPerLine * 3);
+  const visibleText = visibleWords.join(' ');
+  const visibleStartIndex = words.slice(0, currentLineStart).join(' ').length + (currentLineStart > 0 ? 1 : 0);
+  const adjustedCurrentIndex = Math.max(0, currentIndex - visibleStartIndex);
+  const visibleCharacters = characters.slice(visibleStartIndex, visibleStartIndex + visibleText.length);
+
   return (
-    <div className="relative w-full max-w-4xl mx-auto">
+    <div className="relative w-full max-w-6xl mx-auto">
       <input
         ref={inputRef}
         type="text"
@@ -51,22 +86,22 @@ export function TypingArea({ text, characters, currentIndex, userInput, onInput,
       />
       
       <div 
-        className="font-atkinson text-2xl leading-relaxed p-8 border-2 border-border rounded-lg bg-card min-h-[200px] focus-within:border-primary transition-colors cursor-text"
+        className="font-atkinson text-3xl leading-relaxed p-8 min-h-[300px] cursor-text focus-within:outline-none"
         onClick={() => inputRef.current?.focus()}
       >
-        <div className="flex flex-wrap">
-          {characters.map((char, index) => (
+        <div className="flex flex-wrap overflow-hidden" style={{ height: '200px' }}>
+          {visibleCharacters.map((char, index) => (
             <span
-              key={index}
+              key={index + visibleStartIndex}
               className={`${getCharStyle(char, index)} ${
-                index === currentIndex ? 'border-l-2 border-primary animate-caret-blink' : ''
+                index === adjustedCurrentIndex ? 'border-l-4 border-yellow-400 animate-caret-blink' : ''
               }`}
             >
               {char.char === ' ' ? '\u00A0' : char.char}
             </span>
           ))}
-          {currentIndex === characters.length && (
-            <span className="border-l-2 border-primary animate-caret-blink ml-1"></span>
+          {adjustedCurrentIndex === visibleCharacters.length && (
+            <span className="border-l-4 border-yellow-400 animate-caret-blink ml-1"></span>
           )}
         </div>
       </div>

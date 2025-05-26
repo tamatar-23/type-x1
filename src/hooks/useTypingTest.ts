@@ -1,3 +1,4 @@
+
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { TestSettings, TypingStats, Character, TestResult } from '@/types/typing';
 import { generateText } from '@/utils/words';
@@ -20,6 +21,7 @@ export function useTypingTest(settings: TestSettings) {
     charCount: 0
   });
   const [wpmHistory, setWpmHistory] = useState<{ time: number; wpm: number }[]>([]);
+  const [onTestComplete, setOnTestComplete] = useState<(() => void) | null>(null);
   
   const startTime = useRef<number>(0);
   const intervalRef = useRef<NodeJS.Timeout>();
@@ -68,6 +70,20 @@ export function useTypingTest(settings: TestSettings) {
     };
   }, []);
 
+  const finishTest = useCallback(() => {
+    setIsFinished(true);
+    setIsActive(false);
+    if (intervalRef.current) clearInterval(intervalRef.current);
+    if (wpmIntervalRef.current) clearInterval(wpmIntervalRef.current);
+    
+    // Auto-navigate to results after a short delay
+    setTimeout(() => {
+      if (onTestComplete) {
+        onTestComplete();
+      }
+    }, 500);
+  }, [onTestComplete]);
+
   const startTest = useCallback(() => {
     if (!isActive) {
       setIsActive(true);
@@ -77,8 +93,7 @@ export function useTypingTest(settings: TestSettings) {
         intervalRef.current = setInterval(() => {
           setTimeLeft(prev => {
             if (prev <= 1) {
-              setIsFinished(true);
-              setIsActive(false);
+              finishTest();
               return 0;
             }
             return prev - 1;
@@ -86,14 +101,13 @@ export function useTypingTest(settings: TestSettings) {
         }, 1000);
       }
 
-      // Track WPM every second
       wpmIntervalRef.current = setInterval(() => {
         const elapsed = (Date.now() - startTime.current) / 1000;
         const currentStats = calculateStats(userInput, characters, elapsed);
         setWpmHistory(prev => [...prev, { time: elapsed, wpm: currentStats.wpm }]);
       }, 1000);
     }
-  }, [isActive, settings.mode, userInput, characters, calculateStats]);
+  }, [isActive, settings.mode, userInput, characters, calculateStats, finishTest]);
 
   const handleInput = useCallback((input: string) => {
     if (isFinished) return;
@@ -126,10 +140,9 @@ export function useTypingTest(settings: TestSettings) {
     
     // Check if test is complete
     if (settings.mode === 'words' && inputLength >= text.length) {
-      setIsFinished(true);
-      setIsActive(false);
+      finishTest();
     }
-  }, [isFinished, isActive, characters, text, settings.mode, startTest, calculateStats]);
+  }, [isFinished, isActive, characters, text, settings.mode, startTest, calculateStats, finishTest]);
 
   const resetTest = useCallback(() => {
     if (intervalRef.current) clearInterval(intervalRef.current);
@@ -146,6 +159,10 @@ export function useTypingTest(settings: TestSettings) {
       ...stats
     };
   }, [settings, stats, wpmHistory]);
+
+  const setTestCompleteCallback = useCallback((callback: () => void) => {
+    setOnTestComplete(() => callback);
+  }, []);
 
   useEffect(() => {
     initializeTest();
@@ -170,6 +187,7 @@ export function useTypingTest(settings: TestSettings) {
     wpmHistory,
     handleInput,
     resetTest,
-    getResult
+    getResult,
+    setTestCompleteCallback
   };
 }
