@@ -8,68 +8,29 @@ export interface Theme {
 }
 
 export const themes: Record<string, Theme> = {
-  superUser: {
-    label: 'Super User',
-    background: '#262A33',
-    title: '#3FFA5',
-    typeBoxText: '#526777'
+  light: {
+    label: 'Light',
+    background: '#FFFFFF',
+    title: '#2B2B2B',
+    typeBoxText: '#2B2B2B'
   },
-  darkMagic: {
-    label: 'Dark Magic',
-    background: '#091F2C',
-    title: '#A20688',
-    typeBoxText: '#91E401'
+  lightGray: {
+    label: 'Light Gray',
+    background: '#D4D4D4',
+    title: '#2B2B2B',
+    typeBoxText: '#2B2B2B'
   },
-  bento: {
-    label: 'Bento',
-    background: '#2D390D',
-    title: '#FF7A90',
-    typeBoxText: '#4A7680',
-    stats: '#FF7A90'
+  mediumGray: {
+    label: 'Medium Gray',
+    background: '#B3B3B3',
+    title: '#2B2B2B',
+    typeBoxText: '#2B2B2B'
   },
-  futureFunk: {
-    label: 'Future Funk',
-    background: '#2E1A47',
-    title: '#fff',
-    typeBoxText: '#C18FFF',
-    stats: '#fff'
-  },
-  aether: {
-    label: 'Aether',
-    background: '#101820',
-    title: '#EEDAEA',
-    typeBoxText: '#CF68D0',
-    stats: '#EEDAEA'
-  },
-  serika: {
-    label: 'Serika',
-    background: '#323437',
-    title: '#E2B714',
-    typeBoxText: '#D1D0C5'
-  },
-  matrix: {
-    label: 'Matrix',
-    background: '#0D1117',
-    title: '#00FF41',
-    typeBoxText: '#008F11'
-  },
-  retrowave: {
-    label: 'Retrowave',
-    background: '#1A0B2E',
-    title: '#FF6B9D',
-    typeBoxText: '#16213E'
-  },
-  ocean: {
-    label: 'Ocean',
-    background: '#0F3460',
-    title: '#16537E',
-    typeBoxText: '#E8F4FD'
-  },
-  volcano: {
-    label: 'Volcano',
-    background: '#2C0703',
-    title: '#FF4500',
-    typeBoxText: '#FF8C00'
+  dark: {
+    label: 'Dark',
+    background: '#2B2B2B',
+    title: '#FFFFFF',
+    typeBoxText: '#D4D4D4'
   }
 };
 

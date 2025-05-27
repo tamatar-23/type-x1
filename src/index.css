@@ -4,10 +4,10 @@
 @tailwind utilities;
 
 :root {
-  --theme-background: #262A33;
-  --theme-title: #3FFA5;
-  --theme-typebox: #526777;
-  --theme-stats: #3FFA5;
+  --theme-background: #FFFFFF;
+  --theme-title: #2B2B2B;
+  --theme-typebox: #2B2B2B;
+  --theme-stats: #2B2B2B;
 }
 
 @layer base {
@@ -107,5 +107,6 @@
     @apply bg-background text-foreground;
     background-color: var(--theme-background);
     color: var(--theme-typebox);
+    font-family: 'Atkinson Hyperlegible', sans-serif;
   }
 }

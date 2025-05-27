@@ -12,10 +12,10 @@ const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export function ThemeContextProvider({ children }: { children: React.ReactNode }) {
   const [currentTheme, setCurrentTheme] = useState(() => {
-    return localStorage.getItem('typeflow-theme') || 'superUser';
+    return localStorage.getItem('typeflow-theme') || 'light';
   });
 
-  const themeConfig = themes[currentTheme] || themes.superUser;
+  const themeConfig = themes[currentTheme] || themes.light;
 
   const setTheme = (themeName: string) => {
     setCurrentTheme(themeName);

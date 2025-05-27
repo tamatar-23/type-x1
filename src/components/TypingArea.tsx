@@ -46,14 +46,11 @@ export function TypingArea({
       if (e.key === ' ') {
         e.preventDefault();
         
-        // Check if we're in the middle of a word
         const currentChar = text[currentIndex];
         if (currentChar === ' ') {
-          // We're at a space, just add it normally
           const newInput = userInput + ' ';
           onInput(newInput);
         } else {
-          // We're in the middle of a word, skip to end and mark as incorrect
           onSpaceSkip(currentIndex);
         }
       }
@@ -64,27 +61,27 @@ export function TypingArea({
   }, [currentIndex, text, userInput, onInput, onSpaceSkip]);
 
   const getCharStyle = (char: Character, index: number) => {
-    let baseStyle = "relative text-2xl font-mono font-medium";
+    let baseStyle = "relative text-2xl font-atkinson font-bold";
     
     switch (char.status) {
       case 'correct':
-        return `${baseStyle} text-white`;
+        return `${baseStyle}` ;
       case 'incorrect':
         return `${baseStyle} text-red-500 bg-red-500/20`;
       case 'missed':
-        return `${baseStyle} text-gray-500`;
+        return `${baseStyle} opacity-50`;
       default:
-        return `${baseStyle} text-gray-500`;
+        return `${baseStyle} opacity-50`;
     }
   };
 
-  // Split text into words and organize into lines
+  // Split text into words and create lines that fit properly
   const words = text.split(' ');
-  const wordsPerLine = 12;
   const lines: string[][] = [];
+  const maxWordsPerLine = 10; // Reduced to prevent overflow
   
-  for (let i = 0; i < words.length; i += wordsPerLine) {
-    lines.push(words.slice(i, i + wordsPerLine));
+  for (let i = 0; i < words.length; i += maxWordsPerLine) {
+    lines.push(words.slice(i, i + maxWordsPerLine));
   }
 
   // Find which line contains the current position
@@ -100,10 +97,10 @@ export function TypingArea({
     charCount += lineText.length;
   }
 
-  // Update current line index for smooth transitions
+  // Move to next line when cursor reaches the third line
   useEffect(() => {
-    if (targetLineIndex !== currentLineIndex) {
-      setCurrentLineIndex(targetLineIndex);
+    if (targetLineIndex >= currentLineIndex + 2 && targetLineIndex > 0) {
+      setCurrentLineIndex(targetLineIndex - 1);
     }
   }, [targetLineIndex, currentLineIndex]);
 
@@ -121,7 +118,7 @@ export function TypingArea({
   const visibleCharacters = characters.slice(visibleStartIndex, visibleStartIndex + visibleText.length);
 
   return (
-    <div className="relative w-full max-w-6xl mx-auto">
+    <div className="relative w-full max-w-4xl mx-auto">
       <input
         ref={inputRef}
         type="text"
@@ -136,8 +133,9 @@ export function TypingArea({
       />
       
       <div 
-        className="font-mono text-2xl leading-relaxed p-8 min-h-[200px] cursor-text focus-within:outline-none"
+        className="font-atkinson font-bold text-2xl leading-relaxed p-8 min-h-[200px] cursor-text focus-within:outline-none"
         onClick={() => inputRef.current?.focus()}
+        style={{ color: 'var(--theme-typebox)' }}
       >
         <AnimatePresence mode="wait">
           <motion.div
@@ -145,14 +143,13 @@ export function TypingArea({
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
-            transition={{ duration: 0.3, ease: "easeInOut" }}
+            transition={{ duration: 0.2, ease: "easeInOut" }}
             className="overflow-hidden"
-            style={{ height: '150px' }}
+            style={{ height: '180px' }}
           >
             {visibleLines.map((line, lineIdx) => (
-              <div key={currentLineIndex + lineIdx} className="flex flex-wrap mb-2">
+              <div key={currentLineIndex + lineIdx} className="flex flex-wrap mb-4 leading-tight">
                 {line.map((word, wordIdx) => {
-                  // Calculate start index for this word
                   let wordStartIndex = visibleStartIndex;
                   for (let i = 0; i < lineIdx; i++) {
                     wordStartIndex += visibleLines[i].join(' ').length + 1;
@@ -162,7 +159,7 @@ export function TypingArea({
                   }
                   
                   return (
-                    <span key={`${lineIdx}-${wordIdx}`} className="mr-4">
+                    <span key={`${lineIdx}-${wordIdx}`} className="mr-2">
                       {word.split('').map((char, charIdx) => {
                         const globalIndex = wordStartIndex + charIdx;
                         const character = visibleCharacters[globalIndex - visibleStartIndex];
@@ -177,7 +174,7 @@ export function TypingArea({
                           >
                             {char}
                             {globalIndex === currentIndex && (
-                              <span className="absolute top-0 left-0 w-0.5 h-6 bg-yellow-400 animate-pulse"></span>
+                              <span className="absolute top-0 left-0 w-0.5 h-5 bg-yellow-400 animate-pulse"></span>
                             )}
                           </span>
                         );
@@ -194,7 +191,7 @@ export function TypingArea({
                         >
                           {'\u00A0'}
                           {wordStartIndex + word.length === currentIndex && (
-                            <span className="absolute top-0 left-0 w-0.5 h-6 bg-yellow-400 animate-pulse"></span>
+                            <span className="absolute top-0 left-0 w-0.5 h-5 bg-yellow-400 animate-pulse"></span>
                           )}
                         </span>
                       ) : null}
