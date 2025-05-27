@@ -24,10 +24,20 @@ export function ThemeContextProvider({ children }: { children: React.ReactNode }
 
   useEffect(() => {
     const root = document.documentElement;
+    
+    // Apply custom theme variables
     root.style.setProperty('--theme-background', themeConfig.background);
     root.style.setProperty('--theme-title', themeConfig.title);
     root.style.setProperty('--theme-typebox', themeConfig.typeBoxText);
-    root.style.setProperty('--theme-stats', themeConfig.stats || themeConfig.title);
+    root.style.setProperty('--theme-stats', themeConfig.stats);
+    
+    // Apply shadcn theme class for UI components
+    root.classList.remove('light', 'dark');
+    root.classList.add(themeConfig.isDark ? 'dark' : 'light');
+    
+    // Update body background
+    document.body.style.backgroundColor = themeConfig.background;
+    document.body.style.color = themeConfig.typeBoxText;
   }, [themeConfig]);
 
   return (
