@@ -1,9 +1,7 @@
-
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { User, Github } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { ThemeToggle } from '@/components/theme-toggle';
 import { TypingArea } from '@/components/TypingArea';
 import { ModeSelector } from '@/components/ModeSelector';
 import { StatsDisplay } from '@/components/StatsDisplay';
@@ -150,7 +148,6 @@ const Index = () => {
         </a>
         <div className="flex items-center gap-4">
           <ThemeSelector />
-          <ThemeToggle />
         </div>
       </footer>
     </div>

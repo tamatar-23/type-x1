@@ -24,12 +24,31 @@ export function TypingArea({
 }: TypingAreaProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [currentLineIndex, setCurrentLineIndex] = useState(0);
+  const [isFocused, setIsFocused] = useState(false);
 
   useEffect(() => {
     if (inputRef.current && !isFinished) {
       inputRef.current.focus();
+      setIsFocused(true);
     }
   }, [isFinished]);
+
+  const handleFocus = () => {
+    setIsFocused(true);
+    if (inputRef.current) {
+      inputRef.current.focus();
+    }
+  };
+
+  const handleBlur = () => {
+    setIsFocused(false);
+  };
+
+  const handleContainerClick = () => {
+    if (!isFocused) {
+      handleFocus();
+    }
+  };
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -124,6 +143,8 @@ export function TypingArea({
         type="text"
         value={userInput}
         onChange={(e) => onInput(e.target.value)}
+        onFocus={handleFocus}
+        onBlur={handleBlur}
         className="absolute inset-0 opacity-0 cursor-default"
         disabled={isFinished}
         autoComplete="off"
@@ -133,10 +154,32 @@ export function TypingArea({
       />
       
       <div 
-        className="font-atkinson font-bold text-2xl leading-relaxed p-8 min-h-[200px] cursor-text focus-within:outline-none"
-        onClick={() => inputRef.current?.focus()}
+        className="relative font-atkinson font-bold text-2xl leading-relaxed p-8 min-h-[200px] cursor-text focus-within:outline-none"
+        onClick={handleContainerClick}
         style={{ color: 'var(--theme-typebox)' }}
       >
+        {!isFocused && !isFinished && (
+          <div 
+            className="absolute inset-0 flex items-center justify-center z-10 rounded-lg cursor-pointer"
+            style={{ 
+              backgroundColor: 'rgba(0, 0, 0, 0.1)',
+              backdropFilter: 'blur(2px)'
+            }}
+            onClick={handleContainerClick}
+          >
+            <div 
+              className="text-lg font-medium px-4 py-2 rounded-lg"
+              style={{ 
+                color: 'var(--theme-typebox)',
+                backgroundColor: 'var(--theme-background)',
+                opacity: 0.8
+              }}
+            >
+              Click to focus
+            </div>
+          </div>
+        )}
+
         <AnimatePresence mode="wait">
           <motion.div
             key={currentLineIndex}
@@ -173,7 +216,7 @@ export function TypingArea({
                             }`}
                           >
                             {char}
-                            {globalIndex === currentIndex && (
+                            {globalIndex === currentIndex && isFocused && (
                               <span className="absolute top-0 left-0 w-0.5 h-5 bg-yellow-400 animate-pulse"></span>
                             )}
                           </span>
@@ -190,7 +233,7 @@ export function TypingArea({
                           }`}
                         >
                           {'\u00A0'}
-                          {wordStartIndex + word.length === currentIndex && (
+                          {wordStartIndex + word.length === currentIndex && isFocused && (
                             <span className="absolute top-0 left-0 w-0.5 h-5 bg-yellow-400 animate-pulse"></span>
                           )}
                         </span>

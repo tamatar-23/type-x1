@@ -27,10 +27,9 @@ export function Keyboard() {
   }, []);
 
   const keyRows = [
-    ['`', '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '-', '='],
-    ['q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p', '[', ']', '\\'],
-    ['a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', ';', "'"],
-    ['z', 'x', 'c', 'v', 'b', 'n', 'm', ',', '.', '/']
+    ['q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p'],
+    ['a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l'],
+    ['z', 'x', 'c', 'v', 'b', 'n', 'm']
   ];
 
   const getKeyStyle = (key: string) => {
@@ -44,41 +43,26 @@ export function Keyboard() {
   };
 
   return (
-    <div 
-      className="w-full max-w-4xl mx-auto mt-8 p-4 rounded-lg"
-      style={{ backgroundColor: 'var(--theme-keyboard-bg)' }}
-    >
+    <div className="w-full max-w-2xl mx-auto mt-8">
       {/* First row */}
-      <div className="flex gap-1 mb-2 justify-center">
+      <div className="flex gap-2 mb-2 justify-center">
         {keyRows[0].map((key) => (
           <div
             key={key}
-            className="w-10 h-10 flex items-center justify-center rounded text-sm font-medium border"
+            className="w-10 h-10 flex items-center justify-center rounded text-sm font-medium"
             style={getKeyStyle(key)}
           >
             {key}
           </div>
         ))}
-        <div
-          className="w-20 h-10 flex items-center justify-center rounded text-sm font-medium border ml-1"
-          style={getKeyStyle('backspace')}
-        >
-          ⌫
-        </div>
       </div>
 
       {/* Second row */}
-      <div className="flex gap-1 mb-2 justify-center">
-        <div
-          className="w-16 h-10 flex items-center justify-center rounded text-sm font-medium border"
-          style={getKeyStyle('tab')}
-        >
-          Tab
-        </div>
+      <div className="flex gap-2 mb-2 justify-center">
         {keyRows[1].map((key) => (
           <div
             key={key}
-            className="w-10 h-10 flex items-center justify-center rounded text-sm font-medium border"
+            className="w-10 h-10 flex items-center justify-center rounded text-sm font-medium"
             style={getKeyStyle(key)}
           >
             {key}
@@ -87,97 +71,30 @@ export function Keyboard() {
       </div>
 
       {/* Third row */}
-      <div className="flex gap-1 mb-2 justify-center">
-        <div
-          className="w-20 h-10 flex items-center justify-center rounded text-sm font-medium border"
-          style={getKeyStyle('capslock')}
-        >
-          Caps
-        </div>
+      <div className="flex gap-2 mb-2 justify-center">
         {keyRows[2].map((key) => (
           <div
             key={key}
-            className="w-10 h-10 flex items-center justify-center rounded text-sm font-medium border"
+            className="w-10 h-10 flex items-center justify-center rounded text-sm font-medium"
             style={getKeyStyle(key)}
           >
             {key}
           </div>
         ))}
-        <div
-          className="w-24 h-10 flex items-center justify-center rounded text-sm font-medium border ml-1"
-          style={getKeyStyle('enter')}
-        >
-          Enter
-        </div>
       </div>
 
-      {/* Fourth row */}
-      <div className="flex gap-1 mb-2 justify-center">
+      {/* Space bar and backspace row */}
+      <div className="flex gap-2 justify-center items-center">
         <div
-          className="w-24 h-10 flex items-center justify-center rounded text-sm font-medium border"
-          style={getKeyStyle('shift')}
+          className="w-20 h-10 flex items-center justify-center rounded text-sm font-medium"
+          style={getKeyStyle('backspace')}
         >
-          Shift
-        </div>
-        {keyRows[3].map((key) => (
-          <div
-            key={key}
-            className="w-10 h-10 flex items-center justify-center rounded text-sm font-medium border"
-            style={getKeyStyle(key)}
-          >
-            {key}
-          </div>
-        ))}
-        <div
-          className="w-28 h-10 flex items-center justify-center rounded text-sm font-medium border ml-1"
-          style={getKeyStyle('shift')}
-        >
-          Shift
-        </div>
-      </div>
-
-      {/* Space bar row */}
-      <div className="flex gap-1 justify-center">
-        <div
-          className="w-16 h-10 flex items-center justify-center rounded text-sm font-medium border"
-          style={getKeyStyle('control')}
-        >
-          Ctrl
+          ⌫
         </div>
         <div
-          className="w-16 h-10 flex items-center justify-center rounded text-sm font-medium border"
-          style={getKeyStyle('meta')}
-        >
-          ⌘
-        </div>
-        <div
-          className="w-16 h-10 flex items-center justify-center rounded text-sm font-medium border"
-          style={getKeyStyle('alt')}
-        >
-          Alt
-        </div>
-        <div
-          className="flex-1 max-w-80 h-10 flex items-center justify-center rounded text-sm font-medium border"
+          className="w-64 h-10 flex items-center justify-center rounded text-sm font-medium"
           style={getKeyStyle(' ')}
         >
-        </div>
-        <div
-          className="w-16 h-10 flex items-center justify-center rounded text-sm font-medium border"
-          style={getKeyStyle('alt')}
-        >
-          Alt
-        </div>
-        <div
-          className="w-16 h-10 flex items-center justify-center rounded text-sm font-medium border"
-          style={getKeyStyle('meta')}
-        >
-          ⌘
-        </div>
-        <div
-          className="w-16 h-10 flex items-center justify-center rounded text-sm font-medium border"
-          style={getKeyStyle('control')}
-        >
-          Ctrl
         </div>
       </div>
     </div>
