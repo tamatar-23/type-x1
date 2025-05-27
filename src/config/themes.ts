@@ -5,24 +5,24 @@ export interface Theme {
   title: string;
   typeBoxText: string;
   stats: string;
+  keyboardBackground: string;
+  keyBackground: string;
+  keyText: string;
+  keyPressed: string;
   isDark?: boolean;
 }
 
 export const themes: Record<string, Theme> = {
-  light: {
-    label: 'Light',
-    background: '#FFFFFF',
-    title: '#2B2B2B',
-    typeBoxText: '#2B2B2B',
-    stats: '#2B2B2B',
-    isDark: false
-  },
   lightGray: {
     label: 'Light Gray',
     background: '#D4D4D4',
     title: '#2B2B2B',
     typeBoxText: '#2B2B2B',
     stats: '#2B2B2B',
+    keyboardBackground: '#B3B3B3',
+    keyBackground: '#FFFFFF',
+    keyText: '#2B2B2B',
+    keyPressed: '#A0A0A0',
     isDark: false
   },
   mediumGray: {
@@ -31,6 +31,22 @@ export const themes: Record<string, Theme> = {
     title: '#2B2B2B',
     typeBoxText: '#2B2B2B',
     stats: '#2B2B2B',
+    keyboardBackground: '#9A9A9A',
+    keyBackground: '#D4D4D4',
+    keyText: '#2B2B2B',
+    keyPressed: '#808080',
+    isDark: false
+  },
+  white: {
+    label: 'White',
+    background: '#FFFFFF',
+    title: '#2B2B2B',
+    typeBoxText: '#2B2B2B',
+    stats: '#2B2B2B',
+    keyboardBackground: '#F0F0F0',
+    keyBackground: '#E0E0E0',
+    keyText: '#2B2B2B',
+    keyPressed: '#C0C0C0',
     isDark: false
   },
   dark: {
@@ -39,22 +55,10 @@ export const themes: Record<string, Theme> = {
     title: '#FFFFFF',
     typeBoxText: '#D4D4D4',
     stats: '#FFFFFF',
-    isDark: true
-  },
-  darkGray: {
-    label: 'Dark Gray',
-    background: '#1A1A1A',
-    title: '#FFFFFF',
-    typeBoxText: '#D4D4D4',
-    stats: '#FFFFFF',
-    isDark: true
-  },
-  vantaBlack: {
-    label: 'Vanta Black',
-    background: '#0A0A0A',
-    title: '#FFFFFF',
-    typeBoxText: '#B3B3B3',
-    stats: '#FFFFFF',
+    keyboardBackground: '#1A1A1A',
+    keyBackground: '#404040',
+    keyText: '#FFFFFF',
+    keyPressed: '#606060',
     isDark: true
   }
 };

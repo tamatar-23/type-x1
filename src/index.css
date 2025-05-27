@@ -3,11 +3,17 @@
 @tailwind components;
 @tailwind utilities;
 
+@import url('https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&display=swap');
+
 :root {
-  --theme-background: #FFFFFF;
-  --theme-title: #2B2B2B;
-  --theme-typebox: #2B2B2B;
-  --theme-stats: #2B2B2B;
+  --theme-background: #2B2B2B;
+  --theme-title: #FFFFFF;
+  --theme-typebox: #D4D4D4;
+  --theme-stats: #FFFFFF;
+  --theme-keyboard-bg: #1A1A1A;
+  --theme-key-bg: #404040;
+  --theme-key-text: #FFFFFF;
+  --theme-key-pressed: #606060;
 }
 
 @layer base {

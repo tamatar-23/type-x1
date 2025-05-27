@@ -77,10 +77,19 @@ export function useTypingTest(settings: TestSettings) {
     
     const accuracy = totalChars > 0 ? (correct / totalChars) * 100 : 0;
     const minutes = elapsedTime / 60;
-    const wpm = minutes > 0 ? Math.round((correct / 5) / minutes) : 0;
+    
+    // Improved WPM calculation
+    // Raw WPM = all typed characters / 5 / minutes
+    const rawWpm = minutes > 0 ? Math.round((totalChars / 5) / minutes) : 0;
+    
+    // Net WPM = (correct characters - incorrect characters) / 5 / minutes
+    const netWpm = minutes > 0 ? Math.round(((correct - incorrect) / 5) / minutes) : 0;
+    
+    // If accuracy is 100%, WPM should equal raw speed
+    const finalWpm = accuracy === 100 ? rawWpm : Math.max(0, netWpm);
     
     return {
-      wpm,
+      wpm: finalWpm,
       accuracy: Math.round(accuracy),
       correct,
       incorrect,

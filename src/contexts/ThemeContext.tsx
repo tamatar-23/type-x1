@@ -12,10 +12,10 @@ const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export function ThemeContextProvider({ children }: { children: React.ReactNode }) {
   const [currentTheme, setCurrentTheme] = useState(() => {
-    return localStorage.getItem('typeflow-theme') || 'light';
+    return localStorage.getItem('typeflow-theme') || 'dark';
   });
 
-  const themeConfig = themes[currentTheme] || themes.light;
+  const themeConfig = themes[currentTheme] || themes.dark;
 
   const setTheme = (themeName: string) => {
     setCurrentTheme(themeName);
@@ -30,6 +30,10 @@ export function ThemeContextProvider({ children }: { children: React.ReactNode }
     root.style.setProperty('--theme-title', themeConfig.title);
     root.style.setProperty('--theme-typebox', themeConfig.typeBoxText);
     root.style.setProperty('--theme-stats', themeConfig.stats);
+    root.style.setProperty('--theme-keyboard-bg', themeConfig.keyboardBackground);
+    root.style.setProperty('--theme-key-bg', themeConfig.keyBackground);
+    root.style.setProperty('--theme-key-text', themeConfig.keyText);
+    root.style.setProperty('--theme-key-pressed', themeConfig.keyPressed);
     
     // Apply shadcn theme class for UI components
     root.classList.remove('light', 'dark');

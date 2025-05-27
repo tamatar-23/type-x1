@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { User, Github } from 'lucide-react';
@@ -6,6 +7,7 @@ import { ThemeToggle } from '@/components/theme-toggle';
 import { TypingArea } from '@/components/TypingArea';
 import { ModeSelector } from '@/components/ModeSelector';
 import { StatsDisplay } from '@/components/StatsDisplay';
+import { Keyboard } from '@/components/Keyboard';
 import { useTypingTest } from '@/hooks/useTypingTest';
 import { TestSettings } from '@/types/typing';
 import { ThemeSelector } from '@/components/ThemeSelector';
@@ -118,6 +120,11 @@ const Index = () => {
                 isFinished={isFinished}
               />
             </div>
+          </div>
+
+          {/* Keyboard */}
+          <div className="flex justify-center">
+            <Keyboard />
           </div>
 
           {/* Action Buttons - only show restart during active typing */}
