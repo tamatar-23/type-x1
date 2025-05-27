@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { User, Github } from 'lucide-react';
@@ -68,10 +69,10 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen text-foreground" style={{ backgroundColor: 'var(--theme-background, #262A33)' }}>
+    <div className="min-h-screen text-foreground" style={{ backgroundColor: 'var(--theme-background)' }}>
       {/* Header */}
       <header className="flex justify-between items-center p-6">
-        <Link to="/" className="text-2xl font-bold" style={{ color: 'var(--theme-title, #3FFA5)' }}>
+        <Link to="/" className="text-2xl font-bold" style={{ color: 'var(--theme-title)' }}>
           TypeFlow
         </Link>
         <Link to="/user">

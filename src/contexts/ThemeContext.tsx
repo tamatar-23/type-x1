@@ -12,14 +12,17 @@ const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export function ThemeContextProvider({ children }: { children: React.ReactNode }) {
   const [currentTheme, setCurrentTheme] = useState(() => {
-    return localStorage.getItem('typeflow-theme') || 'dark';
+    const saved = localStorage.getItem('typeflow-theme');
+    return saved && themes[saved] ? saved : 'vantaBlack';
   });
 
-  const themeConfig = themes[currentTheme] || themes.dark;
+  const themeConfig = themes[currentTheme] || themes.vantaBlack;
 
   const setTheme = (themeName: string) => {
-    setCurrentTheme(themeName);
-    localStorage.setItem('typeflow-theme', themeName);
+    if (themes[themeName]) {
+      setCurrentTheme(themeName);
+      localStorage.setItem('typeflow-theme', themeName);
+    }
   };
 
   useEffect(() => {

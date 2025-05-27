@@ -13,6 +13,18 @@ export interface Theme {
 }
 
 export const themes: Record<string, Theme> = {
+  vantaBlack: {
+    label: 'Vanta Black',
+    background: '#2B2B2B',
+    title: '#FFFFFF',
+    typeBoxText: '#D4D4D4',
+    stats: '#FFFFFF',
+    keyboardBackground: 'transparent',
+    keyBackground: '#404040',
+    keyText: '#FFFFFF',
+    keyPressed: '#606060',
+    isDark: true
+  },
   lightGray: {
     label: 'Light Gray',
     background: '#FFFFFF',
@@ -48,18 +60,6 @@ export const themes: Record<string, Theme> = {
     keyText: '#2B2B2B',
     keyPressed: '#737373',
     isDark: false
-  },
-  vantaBlack: {
-    label: 'Vanta Black',
-    background: '#2B2B2B',
-    title: '#FFFFFF',
-    typeBoxText: '#D4D4D4',
-    stats: '#FFFFFF',
-    keyboardBackground: 'transparent',
-    keyBackground: '#404040',
-    keyText: '#FFFFFF',
-    keyPressed: '#606060',
-    isDark: true
   },
   lightBlue: {
     label: 'Light Blue',
