@@ -3,12 +3,20 @@ import { Link } from 'react-router-dom';
 import { ArrowLeft, TrendingUp, Clock, Target, Keyboard } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { useAuth } from '@/hooks/useAuth';
 
 const User = () => {
-  // In a real app, this would check if user is logged in
-  const isLoggedIn = false;
+  const { user, loading, signInWithGoogle, signInWithGithub, signOut } = useAuth();
 
-  if (!isLoggedIn) {
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: 'var(--theme-background)' }}>
+        <div className="text-lg" style={{ color: 'var(--theme-stats)' }}>Loading...</div>
+      </div>
+    );
+  }
+
+  if (!user) {
     return (
       <div className="min-h-screen" style={{ backgroundColor: 'var(--theme-background)', color: 'var(--theme-typebox)' }}>
         {/* Header */}
@@ -39,11 +47,11 @@ const User = () => {
             </div>
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center pt-6">
-              <Button size="lg">
-                Sign Up
+              <Button size="lg" onClick={signInWithGoogle}>
+                Sign Up with Google
               </Button>
-              <Button variant="outline" size="lg">
-                Log In
+              <Button variant="outline" size="lg" onClick={signInWithGithub}>
+                Sign Up with GitHub
               </Button>
             </div>
           </div>
@@ -52,7 +60,7 @@ const User = () => {
     );
   }
 
-  // This would be shown for logged-in users
+  // This is shown for logged-in users
   return (
     <div className="min-h-screen" style={{ backgroundColor: 'var(--theme-background)', color: 'var(--theme-typebox)' }}>
       {/* Header */}
@@ -61,8 +69,10 @@ const User = () => {
           <ArrowLeft className="h-4 w-4" />
           Back to Test
         </Link>
-        <h1 className="text-2xl font-bold" style={{ color: 'var(--theme-title)' }}>User Profile</h1>
-        <Button variant="outline" size="sm">
+        <h1 className="text-2xl font-bold" style={{ color: 'var(--theme-title)' }}>
+          Welcome, {user.displayName}
+        </h1>
+        <Button variant="outline" size="sm" onClick={signOut}>
           Sign Out
         </Button>
       </header>
@@ -70,6 +80,23 @@ const User = () => {
       {/* User Stats */}
       <main className="container mx-auto px-6 py-12">
         <div className="max-w-6xl mx-auto space-y-8">
+          {/* User Info */}
+          <div className="flex items-center gap-4 mb-8">
+            {user.photoURL && (
+              <img 
+                src={user.photoURL} 
+                alt={user.displayName || 'User'} 
+                className="w-16 h-16 rounded-full"
+              />
+            )}
+            <div>
+              <h2 className="text-2xl font-bold" style={{ color: 'var(--theme-title)' }}>
+                {user.displayName}
+              </h2>
+              <p style={{ color: 'var(--theme-stats)' }}>{user.email}</p>
+            </div>
+          </div>
+
           {/* Overview Cards */}
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <Card>
@@ -80,8 +107,8 @@ const User = () => {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-3xl font-bold" style={{ color: 'var(--theme-title)' }}>85</div>
-                <div className="text-xs text-green-500">+5 from last week</div>
+                <div className="text-3xl font-bold" style={{ color: 'var(--theme-title)' }}>0</div>
+                <div className="text-xs" style={{ color: 'var(--theme-stats)' }}>No tests yet</div>
               </CardContent>
             </Card>
 
@@ -93,8 +120,8 @@ const User = () => {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-3xl font-bold" style={{ color: 'var(--theme-title)' }}>94%</div>
-                <div className="text-xs text-green-500">+2% from last week</div>
+                <div className="text-3xl font-bold" style={{ color: 'var(--theme-title)' }}>0%</div>
+                <div className="text-xs" style={{ color: 'var(--theme-stats)' }}>No tests yet</div>
               </CardContent>
             </Card>
 
@@ -106,8 +133,8 @@ const User = () => {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-3xl font-bold" style={{ color: 'var(--theme-title)' }}>24h</div>
-                <div className="text-xs" style={{ color: 'var(--theme-stats)' }}>423 tests completed</div>
+                <div className="text-3xl font-bold" style={{ color: 'var(--theme-title)' }}>0h</div>
+                <div className="text-xs" style={{ color: 'var(--theme-stats)' }}>0 tests completed</div>
               </CardContent>
             </Card>
 
@@ -119,8 +146,8 @@ const User = () => {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-3xl font-bold" style={{ color: 'var(--theme-title)' }}>127</div>
-                <div className="text-xs" style={{ color: 'var(--theme-stats)' }}>Personal record</div>
+                <div className="text-3xl font-bold" style={{ color: 'var(--theme-title)' }}>0</div>
+                <div className="text-xs" style={{ color: 'var(--theme-stats)' }}>No tests yet</div>
               </CardContent>
             </Card>
           </div>
@@ -133,7 +160,7 @@ const User = () => {
             <CardContent>
               <div className="text-center py-8" style={{ color: 'var(--theme-stats)' }}>
                 <Keyboard className="mx-auto h-12 w-12 mb-4" />
-                <p>Your test history will appear here</p>
+                <p>Your test history will appear here once you complete some tests</p>
               </div>
             </CardContent>
           </Card>

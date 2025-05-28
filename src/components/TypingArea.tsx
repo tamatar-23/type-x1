@@ -1,4 +1,3 @@
-
 import { useRef, useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Character } from '@/types/typing';
@@ -94,10 +93,10 @@ export function TypingArea({
     }
   };
 
-  // Split text into words and create lines that fit properly
+  // Split text into words and create lines that fit properly - increased to 11 words per line
   const words = text.split(' ');
   const lines: string[][] = [];
-  const maxWordsPerLine = 10; // Reduced to prevent overflow
+  const maxWordsPerLine = 11; // Increased from 10 to 11
   
   for (let i = 0; i < words.length; i += maxWordsPerLine) {
     lines.push(words.slice(i, i + maxWordsPerLine));
@@ -222,8 +221,7 @@ export function TypingArea({
                           </span>
                         );
                       })}
-                      {/* Add space character */}
-                      {wordIdx < line.length - 1 || lineIdx < visibleLines.length - 1 ? (
+                      {(wordIdx < line.length - 1 || lineIdx < visibleLines.length - 1) ? (
                         <span
                           className={`${getCharStyle(
                             visibleCharacters[wordStartIndex + word.length - visibleStartIndex] || { char: ' ', status: 'pending' },

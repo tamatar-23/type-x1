@@ -27,13 +27,13 @@ export function Keyboard() {
   }, []);
 
   const keyRows = [
-    ['q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p'],
+    ['q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p', '⌫'],
     ['a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l'],
     ['z', 'x', 'c', 'v', 'b', 'n', 'm']
   ];
 
   const getKeyStyle = (key: string) => {
-    const isPressed = pressedKeys.has(key) || pressedKeys.has(key.toLowerCase());
+    const isPressed = pressedKeys.has(key) || pressedKeys.has(key.toLowerCase()) || (key === '⌫' && pressedKeys.has('backspace'));
     return {
       backgroundColor: isPressed ? 'var(--theme-key-pressed)' : 'var(--theme-key-bg)',
       color: 'var(--theme-key-text)',
@@ -44,12 +44,12 @@ export function Keyboard() {
 
   return (
     <div className="w-full max-w-2xl mx-auto mt-8">
-      {/* First row */}
+      {/* First row with backspace after p */}
       <div className="flex gap-2 mb-2 justify-center">
         {keyRows[0].map((key) => (
           <div
             key={key}
-            className="w-10 h-10 flex items-center justify-center rounded text-sm font-medium"
+            className={`${key === '⌫' ? 'w-16' : 'w-10'} h-10 flex items-center justify-center rounded text-sm font-medium`}
             style={getKeyStyle(key)}
           >
             {key}
@@ -83,14 +83,8 @@ export function Keyboard() {
         ))}
       </div>
 
-      {/* Space bar and backspace row */}
+      {/* Space bar */}
       <div className="flex gap-2 justify-center items-center">
-        <div
-          className="w-20 h-10 flex items-center justify-center rounded text-sm font-medium"
-          style={getKeyStyle('backspace')}
-        >
-          ⌫
-        </div>
         <div
           className="w-64 h-10 flex items-center justify-center rounded text-sm font-medium"
           style={getKeyStyle(' ')}
