@@ -24,15 +24,15 @@ export function ResultsDisplay({ result, onRestart }: ResultsDisplayProps) {
   return (
     <div className="max-w-6xl mx-auto space-y-8 animate-fade-in">
       {/* Main WPM and Accuracy on left, Graph on right */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-        {/* Left side - WPM and Accuracy */}
-        <div className="space-y-6 px-4">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
+        {/* Left side - WPM and Accuracy - reduced from lg:grid-cols-2 to smaller space */}
+        <div className="space-y-6 px-2">
           <div className="animate-scale-in" style={{ animationDelay: '0.1s' }}>
             <div className="text-left">
               <div className="text-sm opacity-75 mb-2" style={{ color: 'var(--theme-stats)' }}>
                 wpm
               </div>
-              <div className="text-6xl font-bold" style={{ color: 'var(--theme-stats)' }}>
+              <div className="text-5xl font-bold" style={{ color: 'var(--theme-stats)' }}>
                 {result.wpm}
               </div>
             </div>
@@ -43,19 +43,19 @@ export function ResultsDisplay({ result, onRestart }: ResultsDisplayProps) {
               <div className="text-sm opacity-75 mb-2" style={{ color: 'var(--theme-stats)' }}>
                 acc
               </div>
-              <div className="text-6xl font-bold" style={{ color: 'var(--theme-stats)' }}>
+              <div className="text-5xl font-bold" style={{ color: 'var(--theme-stats)' }}>
                 {result.accuracy}%
               </div>
             </div>
           </div>
         </div>
 
-        {/* Right side - Graph */}
-        <div className="animate-fade-in px-4" style={{ animationDelay: '0.3s' }}>
+        {/* Right side - Graph - increased from lg:grid-cols-2 to take more space */}
+        <div className="lg:col-span-2 animate-fade-in px-2" style={{ animationDelay: '0.3s' }}>
           {result.wpmHistory && result.wpmHistory.length > 1 ? (
-            <ChartContainer config={chartConfig} className="h-64">
+            <ChartContainer config={chartConfig} className="h-64 w-full">
               <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={result.wpmHistory}>
+                <LineChart data={result.wpmHistory} margin={{ top: 20, right: 30, left: 20, bottom: 20 }}>
                   <CartesianGrid 
                     strokeDasharray="3 3" 
                     stroke="var(--theme-stats)" 
@@ -89,7 +89,7 @@ export function ResultsDisplay({ result, onRestart }: ResultsDisplayProps) {
             </ChartContainer>
           ) : (
             <div 
-              className="h-64 rounded-lg border-2 border-dashed flex items-center justify-center"
+              className="h-64 rounded-lg border-2 border-dashed flex items-center justify-center w-full"
               style={{ borderColor: 'var(--theme-stats)', opacity: 0.3 }}
             >
               <div className="text-center" style={{ color: 'var(--theme-stats)' }}>
@@ -105,7 +105,7 @@ export function ResultsDisplay({ result, onRestart }: ResultsDisplayProps) {
       <div className="space-y-6 px-4">
         {/* Test type and other info */}
         <div className="animate-fade-in" style={{ animationDelay: '0.4s' }}>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-left">
+          <div className="grid grid-cols-2 gap-6 text-left">
             <div>
               <div className="text-sm opacity-75 mb-1" style={{ color: 'var(--theme-stats)' }}>
                 test type
@@ -124,24 +124,6 @@ export function ResultsDisplay({ result, onRestart }: ResultsDisplayProps) {
               </div>
               <div className="text-2xl font-bold" style={{ color: 'var(--theme-stats)' }}>
                 {Math.round((result.charCount / 5) / (result.totalTime / 60))}
-              </div>
-            </div>
-            
-            <div>
-              <div className="text-sm opacity-75 mb-1" style={{ color: 'var(--theme-stats)' }}>
-                characters
-              </div>
-              <div className="text-2xl font-bold" style={{ color: 'var(--theme-stats)' }}>
-                {result.correct}/{result.incorrect}/{result.missed}/0
-              </div>
-            </div>
-            
-            <div>
-              <div className="text-sm opacity-75 mb-1" style={{ color: 'var(--theme-stats)' }}>
-                consistency
-              </div>
-              <div className="text-2xl font-bold" style={{ color: 'var(--theme-stats)' }}>
-                {Math.round(result.accuracy)}%
               </div>
             </div>
           </div>

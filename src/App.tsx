@@ -9,6 +9,7 @@ import { ThemeContextProvider } from "@/contexts/ThemeContext";
 import Index from "./pages/Index";
 import Results from "./pages/Results";
 import User from "./pages/User";
+import Login from "./pages/Login";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -25,6 +26,7 @@ const App = () => (
               <Route path="/" element={<Index />} />
               <Route path="/results" element={<Results />} />
               <Route path="/user" element={<User />} />
+              <Route path="/login" element={<Login />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>
