@@ -31,9 +31,15 @@ export function ThemeSelector() {
           <span className="text-sm font-medium">{currentThemeLabel}</span>
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-w-md">
+      <DialogContent 
+        className="max-w-md border-0"
+        style={{ 
+          backgroundColor: 'var(--theme-background)',
+          color: 'var(--theme-typebox)'
+        }}
+      >
         <DialogHeader>
-          <DialogTitle>Select Theme</DialogTitle>
+          <DialogTitle style={{ color: 'var(--theme-title)' }}>Select Theme</DialogTitle>
         </DialogHeader>
         <div className="grid grid-cols-2 gap-3 mt-4">
           {themeOptions.map((option) => {
@@ -48,30 +54,45 @@ export function ThemeSelector() {
                 className={`
                   p-3 rounded-lg border-2 transition-all text-left hover:scale-105
                   ${currentTheme === option.value 
-                    ? 'border-blue-400 bg-blue-400/10 shadow-lg' 
-                    : 'border-gray-600 hover:border-gray-400'
+                    ? 'shadow-lg' 
+                    : 'hover:opacity-80'
                   }
                 `}
                 style={{
-                  backgroundColor: `${theme.background}20`,
-                  borderColor: currentTheme === option.value ? '#60A5FA' : undefined
+                  backgroundColor: `${theme.background}`,
+                  borderColor: currentTheme === option.value ? theme.title : theme.typeBoxText,
+                  borderWidth: currentTheme === option.value ? '2px' : '1px'
                 }}
               >
                 <div className="flex items-center gap-2 mb-2">
                   <div 
-                    className="w-4 h-4 rounded-full border border-white/20"
-                    style={{ backgroundColor: theme.background }}
+                    className="w-4 h-4 rounded-full border"
+                    style={{ 
+                      backgroundColor: theme.background,
+                      borderColor: theme.typeBoxText
+                    }}
                   />
                   <div 
-                    className="w-4 h-4 rounded-full border border-white/20"
-                    style={{ backgroundColor: theme.title }}
+                    className="w-4 h-4 rounded-full border"
+                    style={{ 
+                      backgroundColor: theme.title,
+                      borderColor: theme.typeBoxText
+                    }}
                   />
                   <div 
-                    className="w-4 h-4 rounded-full border border-white/20"
-                    style={{ backgroundColor: theme.typeBoxText }}
+                    className="w-4 h-4 rounded-full border"
+                    style={{ 
+                      backgroundColor: theme.typeBoxText,
+                      borderColor: theme.typeBoxText
+                    }}
                   />
                 </div>
-                <div className="text-sm font-medium text-foreground">{option.label}</div>
+                <div 
+                  className="text-sm font-medium"
+                  style={{ color: theme.title }}
+                >
+                  {option.label}
+                </div>
               </button>
             );
           })}

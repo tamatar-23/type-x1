@@ -1,5 +1,6 @@
+
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { User, Github } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { TypingArea } from '@/components/TypingArea';
@@ -8,6 +9,7 @@ import { StatsDisplay } from '@/components/StatsDisplay';
 import { Keyboard } from '@/components/Keyboard';
 import { ResultsDisplay } from '@/components/ResultsDisplay';
 import { useTypingTest } from '@/hooks/useTypingTest';
+import { useAuth } from '@/hooks/useAuth';
 import { TestSettings } from '@/types/typing';
 import { ThemeSelector } from '@/components/ThemeSelector';
 
@@ -29,6 +31,8 @@ const getSavedSettings = (): TestSettings => {
 };
 
 const Index = () => {
+  const navigate = useNavigate();
+  const { user, loading } = useAuth();
   const [settings, setSettings] = useState<TestSettings>(getSavedSettings());
   const [showResults, setShowResults] = useState(false);
 
@@ -60,6 +64,16 @@ const Index = () => {
     resetTest();
   };
 
+  const handleUserIconClick = () => {
+    if (loading) return;
+    
+    if (user) {
+      navigate('/user');
+    } else {
+      navigate('/login');
+    }
+  };
+
   return (
     <div className="min-h-screen text-foreground" style={{ backgroundColor: 'var(--theme-background)' }}>
       {/* Header with improved visibility */}
@@ -67,16 +81,15 @@ const Index = () => {
         <Link to="/" className="text-2xl font-bold" style={{ color: 'var(--theme-title)' }}>
           TypeFlow
         </Link>
-        <Link to="/user">
-          <Button 
-            variant="ghost" 
-            size="icon"
-            className="hover:bg-white/10"
-            style={{ color: 'var(--theme-title)' }}
-          >
-            <User className="h-5 w-5" />
-          </Button>
-        </Link>
+        <Button 
+          variant="ghost" 
+          size="icon"
+          className="hover:bg-white/10"
+          style={{ color: 'var(--theme-title)' }}
+          onClick={handleUserIconClick}
+        >
+          <User className="h-5 w-5" />
+        </Button>
       </header>
 
       {/* Main Content */}
