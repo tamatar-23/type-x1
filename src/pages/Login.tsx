@@ -37,7 +37,10 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4" style={{ backgroundColor: 'var(--theme-background)' }}>
+    <div 
+      className="min-h-screen flex items-center justify-center p-4" 
+      style={{ backgroundColor: 'var(--theme-background)' }}
+    >
       {/* Back button */}
       <Link 
         to="/" 
@@ -50,17 +53,41 @@ const Login = () => {
 
       <div className="w-full max-w-md">
         <Tabs defaultValue="login" className="w-full">
-          <TabsList className="grid w-full grid-cols-2 mb-6">
-            <TabsTrigger value="login">Login</TabsTrigger>
-            <TabsTrigger value="register">Register</TabsTrigger>
+          <TabsList 
+            className="grid w-full grid-cols-2 mb-6"
+            style={{ 
+              backgroundColor: 'var(--theme-background)',
+              borderColor: 'var(--theme-stats)'
+            }}
+          >
+            <TabsTrigger 
+              value="login"
+              style={{ color: 'var(--theme-typebox)' }}
+              className="data-[state=active]:bg-[var(--theme-title)] data-[state=active]:text-[var(--theme-background)]"
+            >
+              Login
+            </TabsTrigger>
+            <TabsTrigger 
+              value="register"
+              style={{ color: 'var(--theme-typebox)' }}
+              className="data-[state=active]:bg-[var(--theme-title)] data-[state=active]:text-[var(--theme-background)]"
+            >
+              Register
+            </TabsTrigger>
           </TabsList>
 
           {/* Login Tab */}
           <TabsContent value="login">
-            <Card>
+            <Card 
+              style={{ 
+                backgroundColor: 'var(--theme-background)',
+                borderColor: 'var(--theme-stats)',
+                color: 'var(--theme-typebox)'
+              }}
+            >
               <CardHeader className="text-center">
                 <CardTitle style={{ color: 'var(--theme-title)' }}>Welcome back</CardTitle>
-                <CardDescription>Sign in to your account</CardDescription>
+                <CardDescription style={{ color: 'var(--theme-stats)' }}>Sign in to your account</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 {/* Social Login Buttons */}
@@ -70,6 +97,11 @@ const Login = () => {
                     className="w-full" 
                     onClick={handleGoogleSignIn}
                     disabled={isLoading}
+                    style={{ 
+                      borderColor: 'var(--theme-stats)',
+                      color: 'var(--theme-typebox)',
+                      backgroundColor: 'transparent'
+                    }}
                   >
                     <svg className="w-4 h-4 mr-2" viewBox="0 0 24 24">
                       <path fill="currentColor" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
@@ -85,6 +117,11 @@ const Login = () => {
                     className="w-full" 
                     onClick={handleGithubSignIn}
                     disabled={isLoading}
+                    style={{ 
+                      borderColor: 'var(--theme-stats)',
+                      color: 'var(--theme-typebox)',
+                      backgroundColor: 'transparent'
+                    }}
                   >
                     <Github className="w-4 h-4 mr-2" />
                     Continue with GitHub
@@ -93,36 +130,74 @@ const Login = () => {
 
                 <div className="relative">
                   <div className="absolute inset-0 flex items-center">
-                    <span className="w-full border-t" />
+                    <span className="w-full border-t" style={{ borderColor: 'var(--theme-stats)' }} />
                   </div>
                   <div className="relative flex justify-center text-xs uppercase">
-                    <span className="bg-background px-2 text-muted-foreground">or</span>
+                    <span 
+                      className="px-2" 
+                      style={{ 
+                        backgroundColor: 'var(--theme-background)', 
+                        color: 'var(--theme-stats)' 
+                      }}
+                    >
+                      or
+                    </span>
                   </div>
                 </div>
 
                 {/* Email/Password Form */}
                 <div className="space-y-4">
                   <div className="space-y-2">
-                    <Label htmlFor="email">Email</Label>
-                    <Input id="email" type="email" placeholder="Enter your email" />
+                    <Label htmlFor="email" style={{ color: 'var(--theme-typebox)' }}>Email</Label>
+                    <Input 
+                      id="email" 
+                      type="email" 
+                      placeholder="Enter your email"
+                      style={{ 
+                        backgroundColor: 'var(--theme-background)',
+                        borderColor: 'var(--theme-stats)',
+                        color: 'var(--theme-typebox)'
+                      }}
+                    />
                   </div>
                   
                   <div className="space-y-2">
-                    <Label htmlFor="password">Password</Label>
-                    <Input id="password" type="password" placeholder="Enter your password" />
+                    <Label htmlFor="password" style={{ color: 'var(--theme-typebox)' }}>Password</Label>
+                    <Input 
+                      id="password" 
+                      type="password" 
+                      placeholder="Enter your password"
+                      style={{ 
+                        backgroundColor: 'var(--theme-background)',
+                        borderColor: 'var(--theme-stats)',
+                        color: 'var(--theme-typebox)'
+                      }}
+                    />
                   </div>
 
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-2">
                       <Checkbox id="remember" />
-                      <Label htmlFor="remember" className="text-sm">Remember me</Label>
+                      <Label htmlFor="remember" className="text-sm" style={{ color: 'var(--theme-typebox)' }}>Remember me</Label>
                     </div>
-                    <Link to="/forgot-password" className="text-sm text-primary hover:underline">
+                    <Link 
+                      to="/forgot-password" 
+                      className="text-sm hover:underline"
+                      style={{ color: 'var(--theme-title)' }}
+                    >
                       Forgot password?
                     </Link>
                   </div>
 
-                  <Button className="w-full">Sign in</Button>
+                  <Button 
+                    className="w-full"
+                    style={{ 
+                      backgroundColor: 'var(--theme-title)',
+                      color: 'var(--theme-background)'
+                    }}
+                  >
+                    Sign in
+                  </Button>
                 </div>
               </CardContent>
             </Card>
@@ -130,10 +205,16 @@ const Login = () => {
 
           {/* Register Tab */}
           <TabsContent value="register">
-            <Card>
+            <Card 
+              style={{ 
+                backgroundColor: 'var(--theme-background)',
+                borderColor: 'var(--theme-stats)',
+                color: 'var(--theme-typebox)'
+              }}
+            >
               <CardHeader className="text-center">
                 <CardTitle style={{ color: 'var(--theme-title)' }}>Create account</CardTitle>
-                <CardDescription>Get started with TypeFlow</CardDescription>
+                <CardDescription style={{ color: 'var(--theme-stats)' }}>Get started with TypeFlow</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 {/* Social Registration */}
@@ -143,6 +224,11 @@ const Login = () => {
                     className="w-full" 
                     onClick={handleGoogleSignIn}
                     disabled={isLoading}
+                    style={{ 
+                      borderColor: 'var(--theme-stats)',
+                      color: 'var(--theme-typebox)',
+                      backgroundColor: 'transparent'
+                    }}
                   >
                     <svg className="w-4 h-4 mr-2" viewBox="0 0 24 24">
                       <path fill="currentColor" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
@@ -158,6 +244,11 @@ const Login = () => {
                     className="w-full" 
                     onClick={handleGithubSignIn}
                     disabled={isLoading}
+                    style={{ 
+                      borderColor: 'var(--theme-stats)',
+                      color: 'var(--theme-typebox)',
+                      backgroundColor: 'transparent'
+                    }}
                   >
                     <Github className="w-4 h-4 mr-2" />
                     Sign up with GitHub
@@ -166,41 +257,101 @@ const Login = () => {
 
                 <div className="relative">
                   <div className="absolute inset-0 flex items-center">
-                    <span className="w-full border-t" />
+                    <span className="w-full border-t" style={{ borderColor: 'var(--theme-stats)' }} />
                   </div>
                   <div className="relative flex justify-center text-xs uppercase">
-                    <span className="bg-background px-2 text-muted-foreground">or</span>
+                    <span 
+                      className="px-2" 
+                      style={{ 
+                        backgroundColor: 'var(--theme-background)', 
+                        color: 'var(--theme-stats)' 
+                      }}
+                    >
+                      or
+                    </span>
                   </div>
                 </div>
 
                 {/* Registration Form */}
                 <div className="space-y-4">
                   <div className="space-y-2">
-                    <Label htmlFor="username">Username</Label>
-                    <Input id="username" placeholder="Choose a username" />
+                    <Label htmlFor="username" style={{ color: 'var(--theme-typebox)' }}>Username</Label>
+                    <Input 
+                      id="username" 
+                      placeholder="Choose a username"
+                      style={{ 
+                        backgroundColor: 'var(--theme-background)',
+                        borderColor: 'var(--theme-stats)',
+                        color: 'var(--theme-typebox)'
+                      }}
+                    />
                   </div>
                   
                   <div className="space-y-2">
-                    <Label htmlFor="reg-email">Email</Label>
-                    <Input id="reg-email" type="email" placeholder="Enter your email" />
+                    <Label htmlFor="reg-email" style={{ color: 'var(--theme-typebox)' }}>Email</Label>
+                    <Input 
+                      id="reg-email" 
+                      type="email" 
+                      placeholder="Enter your email"
+                      style={{ 
+                        backgroundColor: 'var(--theme-background)',
+                        borderColor: 'var(--theme-stats)',
+                        color: 'var(--theme-typebox)'
+                      }}
+                    />
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="verify-email">Verify Email</Label>
-                    <Input id="verify-email" type="email" placeholder="Confirm your email" />
+                    <Label htmlFor="verify-email" style={{ color: 'var(--theme-typebox)' }}>Verify Email</Label>
+                    <Input 
+                      id="verify-email" 
+                      type="email" 
+                      placeholder="Confirm your email"
+                      style={{ 
+                        backgroundColor: 'var(--theme-background)',
+                        borderColor: 'var(--theme-stats)',
+                        color: 'var(--theme-typebox)'
+                      }}
+                    />
                   </div>
                   
                   <div className="space-y-2">
-                    <Label htmlFor="reg-password">Password</Label>
-                    <Input id="reg-password" type="password" placeholder="Create a password" />
+                    <Label htmlFor="reg-password" style={{ color: 'var(--theme-typebox)' }}>Password</Label>
+                    <Input 
+                      id="reg-password" 
+                      type="password" 
+                      placeholder="Create a password"
+                      style={{ 
+                        backgroundColor: 'var(--theme-background)',
+                        borderColor: 'var(--theme-stats)',
+                        color: 'var(--theme-typebox)'
+                      }}
+                    />
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="verify-password">Verify Password</Label>
-                    <Input id="verify-password" type="password" placeholder="Confirm your password" />
+                    <Label htmlFor="verify-password" style={{ color: 'var(--theme-typebox)' }}>Verify Password</Label>
+                    <Input 
+                      id="verify-password" 
+                      type="password" 
+                      placeholder="Confirm your password"
+                      style={{ 
+                        backgroundColor: 'var(--theme-background)',
+                        borderColor: 'var(--theme-stats)',
+                        color: 'var(--theme-typebox)'
+                      }}
+                    />
                   </div>
 
-                  <Button className="w-full">Sign up</Button>
+                  <Button 
+                    className="w-full"
+                    style={{ 
+                      backgroundColor: 'var(--theme-title)',
+                      color: 'var(--theme-background)'
+                    }}
+                  >
+                    Sign up
+                  </Button>
                 </div>
               </CardContent>
             </Card>

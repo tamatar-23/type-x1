@@ -161,8 +161,8 @@ export function TypingArea({
           <div 
             className="absolute inset-0 flex items-center justify-center z-10 rounded-lg cursor-pointer"
             style={{ 
-              backgroundColor: 'rgba(0, 0, 0, 0.1)',
-              backdropFilter: 'blur(2px)'
+              backgroundColor: 'var(--theme-background)',
+              opacity: 0.7
             }}
             onClick={handleContainerClick}
           >
@@ -171,7 +171,7 @@ export function TypingArea({
               style={{ 
                 color: 'var(--theme-typebox)',
                 backgroundColor: 'var(--theme-background)',
-                opacity: 0.8
+                opacity: 0.9
               }}
             >
               Click to focus
