@@ -16,14 +16,19 @@ export function ThemeSelector() {
   const { currentTheme, setTheme } = useThemeContext();
   const [open, setOpen] = useState(false);
 
-  const currentThemeLabel = themes[currentTheme]?.label || 'Super User';
+  const currentThemeLabel = themes[currentTheme]?.label || 'Theme';
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="ghost" size="sm" className="flex items-center gap-2">
+        <Button 
+          variant="ghost" 
+          size="sm" 
+          className="flex items-center gap-2 hover:bg-white/10 border border-white/20"
+          style={{ color: 'var(--theme-stats)' }}
+        >
           <Palette className="h-4 w-4" />
-          <span className="text-sm">{currentThemeLabel}</span>
+          <span className="text-sm font-medium">{currentThemeLabel}</span>
         </Button>
       </DialogTrigger>
       <DialogContent className="max-w-md">
@@ -41,32 +46,32 @@ export function ThemeSelector() {
                   setOpen(false);
                 }}
                 className={`
-                  p-3 rounded-lg border-2 transition-all text-left
+                  p-3 rounded-lg border-2 transition-all text-left hover:scale-105
                   ${currentTheme === option.value 
-                    ? 'border-yellow-400 bg-yellow-400/10' 
+                    ? 'border-blue-400 bg-blue-400/10 shadow-lg' 
                     : 'border-gray-600 hover:border-gray-400'
                   }
                 `}
                 style={{
                   backgroundColor: `${theme.background}20`,
-                  borderColor: currentTheme === option.value ? theme.title : undefined
+                  borderColor: currentTheme === option.value ? '#60A5FA' : undefined
                 }}
               >
                 <div className="flex items-center gap-2 mb-2">
                   <div 
-                    className="w-4 h-4 rounded-full"
+                    className="w-4 h-4 rounded-full border border-white/20"
                     style={{ backgroundColor: theme.background }}
                   />
                   <div 
-                    className="w-4 h-4 rounded-full"
+                    className="w-4 h-4 rounded-full border border-white/20"
                     style={{ backgroundColor: theme.title }}
                   />
                   <div 
-                    className="w-4 h-4 rounded-full"
+                    className="w-4 h-4 rounded-full border border-white/20"
                     style={{ backgroundColor: theme.typeBoxText }}
                   />
                 </div>
-                <div className="text-sm font-medium">{option.label}</div>
+                <div className="text-sm font-medium text-foreground">{option.label}</div>
               </button>
             );
           })}

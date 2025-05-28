@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { User, Github } from 'lucide-react';
@@ -63,20 +62,25 @@ const Index = () => {
 
   return (
     <div className="min-h-screen text-foreground" style={{ backgroundColor: 'var(--theme-background)' }}>
-      {/* Header */}
+      {/* Header with improved visibility */}
       <header className="flex justify-between items-center p-6">
         <Link to="/" className="text-2xl font-bold" style={{ color: 'var(--theme-title)' }}>
           TypeFlow
         </Link>
         <Link to="/user">
-          <Button variant="ghost" size="icon">
+          <Button 
+            variant="ghost" 
+            size="icon"
+            className="hover:bg-white/10"
+            style={{ color: 'var(--theme-title)' }}
+          >
             <User className="h-5 w-5" />
           </Button>
         </Link>
       </header>
 
       {/* Main Content */}
-      <main className="container mx-auto px-6 py-8">
+      <main className="container mx-auto px-8 py-8">
         <div className="max-w-5xl mx-auto space-y-8">
           {showResults ? (
             <ResultsDisplay result={getResult()} onRestart={handleRestart} />
@@ -103,8 +107,8 @@ const Index = () => {
                 )}
               </div>
 
-              {/* Typing Area - better centered */}
-              <div className="flex justify-center px-4">
+              {/* Typing Area - better centered with more padding */}
+              <div className="flex justify-center px-6">
                 <div className="w-full max-w-4xl">
                   <TypingArea
                     text={text}
@@ -119,7 +123,7 @@ const Index = () => {
               </div>
 
               {/* Keyboard */}
-              <div className="flex justify-center">
+              <div className="flex justify-center px-6">
                 <Keyboard />
               </div>
 
@@ -136,13 +140,14 @@ const Index = () => {
         </div>
       </main>
 
-      {/* Footer */}
+      {/* Footer with improved visibility */}
       <footer className="fixed bottom-0 left-0 right-0 flex justify-between items-center p-6">
         <a
           href="https://github.com"
           target="_blank"
           rel="noopener noreferrer"
-          className="text-muted-foreground hover:text-foreground transition-colors"
+          className="transition-colors hover:opacity-80"
+          style={{ color: 'var(--theme-stats)' }}
         >
           <Github className="h-5 w-5" />
         </a>
