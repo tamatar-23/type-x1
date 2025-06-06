@@ -29,12 +29,30 @@ export function useAuth() {
       console.log('Attempting Google sign-in...');
       const result = await signInWithPopup(auth, googleProvider);
       console.log('Google sign-in successful:', result.user);
-      await createUserDocument(result.user);
+      
+      // Try to create user document, but don't block navigation if it fails
+      try {
+        await createUserDocument(result.user);
+      } catch (docError: any) {
+        console.warn('Failed to create user document (continuing anyway):', docError);
+        // Continue with navigation even if document creation fails
+      }
+      
       navigate('/user');
       return result.user;
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error signing in with Google:', error);
-      throw error;
+      
+      // Provide specific error messages
+      if (error.code === 'auth/unauthorized-domain') {
+        throw new Error('Domain not authorized. Please add this domain to Firebase authorized domains.');
+      } else if (error.code === 'auth/popup-closed-by-user') {
+        throw new Error('Sign-in was cancelled. Please try again.');
+      } else if (error.code === 'auth/popup-blocked') {
+        throw new Error('Popup was blocked by browser. Please allow popups and try again.');
+      } else {
+        throw new Error(`Authentication failed: ${error.message}`);
+      }
     }
   };
 
@@ -43,12 +61,30 @@ export function useAuth() {
       console.log('Attempting GitHub sign-in...');
       const result = await signInWithPopup(auth, githubProvider);
       console.log('GitHub sign-in successful:', result.user);
-      await createUserDocument(result.user);
+      
+      // Try to create user document, but don't block navigation if it fails
+      try {
+        await createUserDocument(result.user);
+      } catch (docError: any) {
+        console.warn('Failed to create user document (continuing anyway):', docError);
+        // Continue with navigation even if document creation fails
+      }
+      
       navigate('/user');
       return result.user;
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error signing in with GitHub:', error);
-      throw error;
+      
+      // Provide specific error messages
+      if (error.code === 'auth/unauthorized-domain') {
+        throw new Error('Domain not authorized. Please add this domain to Firebase authorized domains.');
+      } else if (error.code === 'auth/popup-closed-by-user') {
+        throw new Error('Sign-in was cancelled. Please try again.');
+      } else if (error.code === 'auth/popup-blocked') {
+        throw new Error('Popup was blocked by browser. Please allow popups and try again.');
+      } else {
+        throw new Error(`Authentication failed: ${error.message}`);
+      }
     }
   };
 
@@ -66,13 +102,14 @@ export function useAuth() {
     if (!user) return;
     
     const userRef = doc(db, 'users', user.uid);
-    const userSnap = await getDoc(userRef);
     
-    if (!userSnap.exists()) {
-      const { displayName, email, photoURL } = user;
-      const createdAt = new Date();
+    try {
+      const userSnap = await getDoc(userRef);
       
-      try {
+      if (!userSnap.exists()) {
+        const { displayName, email, photoURL } = user;
+        const createdAt = new Date();
+        
         await setDoc(userRef, {
           displayName,
           email,
@@ -84,9 +121,11 @@ export function useAuth() {
           averageAccuracy: 0
         });
         console.log('User document created successfully');
-      } catch (error) {
-        console.error('Error creating user document:', error);
       }
+    } catch (error: any) {
+      console.error('Error with user document:', error);
+      // Re-throw the error so it can be caught by the calling function
+      throw error;
     }
   };
 

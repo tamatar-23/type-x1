@@ -17,13 +17,7 @@ const Login = () => {
       await signInWithGoogle();
     } catch (error: any) {
       console.error('Google sign-in failed:', error);
-      if (error.code === 'auth/unauthorized-domain') {
-        setError('Domain not authorized. Please add the current domain to Firebase authorized domains.');
-      } else if (error.code === 'auth/popup-closed-by-user') {
-        setError('Sign-in was cancelled. Please try again.');
-      } else {
-        setError('Sign-in failed. Please try again.');
-      }
+      setError(error.message || 'Sign-in failed. Please try again.');
     } finally {
       setIsLoading(false);
     }
@@ -36,13 +30,7 @@ const Login = () => {
       await signInWithGithub();
     } catch (error: any) {
       console.error('GitHub sign-in failed:', error);
-      if (error.code === 'auth/unauthorized-domain') {
-        setError('Domain not authorized. Please add the current domain to Firebase authorized domains.');
-      } else if (error.code === 'auth/popup-closed-by-user') {
-        setError('Sign-in was cancelled. Please try again.');
-      } else {
-        setError('Sign-in failed. Please try again.');
-      }
+      setError(error.message || 'Sign-in failed. Please try again.');
     } finally {
       setIsLoading(false);
     }
@@ -134,22 +122,6 @@ const Login = () => {
             <Github className="w-5 h-5 mr-3" />
             {isLoading ? 'Signing in...' : 'Continue with GitHub'}
           </Button>
-        </div>
-
-        {/* Setup instructions */}
-        <div 
-          className="text-center p-4 rounded-lg border"
-          style={{ 
-            backgroundColor: 'rgba(59, 130, 246, 0.1)',
-            borderColor: 'rgba(59, 130, 246, 0.3)'
-          }}
-        >
-          <p className="text-sm font-medium mb-2" style={{ color: 'var(--theme-title)' }}>
-            Firebase Setup Required
-          </p>
-          <p className="text-xs" style={{ color: 'var(--theme-stats)' }}>
-            Add this domain to your Firebase project's authorized domains in Authentication → Settings → Authorized domains
-          </p>
         </div>
 
         {/* Footer */}
