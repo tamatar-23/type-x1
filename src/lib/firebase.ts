@@ -4,14 +4,13 @@ import { getAuth, GoogleAuthProvider, GithubAuthProvider } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
 
 const firebaseConfig = {
-  // These would typically come from environment variables
-  // For now, users will need to add their own config
-  apiKey: "your-api-key",
-  authDomain: "your-auth-domain",
-  projectId: "your-project-id",
-  storageBucket: "your-storage-bucket",
-  messagingSenderId: "your-messaging-sender-id",
-  appId: "your-app-id"
+  apiKey: "AIzaSyDPi-N4KxtWNXQEpeeUz6TWpwbBChpMfZc",
+  authDomain: "type-tmtr.firebaseapp.com",
+  projectId: "type-tmtr",
+  storageBucket: "type-tmtr.firebasestorage.app",
+  messagingSenderId: "611600038202",
+  appId: "1:611600038202:web:96bd4fd6c0f287368b7803",
+  measurementId: "G-4CYBEJNM3Y"
 };
 
 const app = initializeApp(firebaseConfig);
