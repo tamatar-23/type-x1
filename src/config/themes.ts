@@ -37,42 +37,6 @@ export const themes: Record<string, Theme> = {
     keyPressed: '#B8B8B8',
     isDark: false
   },
-  lightBlue: {
-    label: 'Light Blue',
-    background: '#E3F2FD',
-    title: '#1565C0',
-    typeBoxText: '#1976D2',
-    stats: '#1565C0',
-    keyboardBackground: 'transparent',
-    keyBackground: '#BBDEFB',
-    keyText: '#1565C0',
-    keyPressed: '#90CAF9',
-    isDark: false
-  },
-  lightPink: {
-    label: 'Light Pink',
-    background: '#FCE4EC',
-    title: '#AD1457',
-    typeBoxText: '#C2185B',
-    stats: '#AD1457',
-    keyboardBackground: 'transparent',
-    keyBackground: '#F8BBD9',
-    keyText: '#AD1457',
-    keyPressed: '#F48FB1',
-    isDark: false
-  },
-  forestGreen: {
-    label: 'Forest Green',
-    background: '#E8F5E8',
-    title: '#2E7D32',
-    typeBoxText: '#388E3C',
-    stats: '#2E7D32',
-    keyboardBackground: 'transparent',
-    keyBackground: '#C8E6C9',
-    keyText: '#2E7D32',
-    keyPressed: '#A5D6A7',
-    isDark: false
-  },
   oceanDark: {
     label: 'Ocean Dark',
     background: '#0F172A',
@@ -155,6 +119,66 @@ export const themes: Record<string, Theme> = {
     keyBackground: '#312E81',
     keyText: '#DDD6FE',
     keyPressed: '#4338CA',
+    isDark: true
+  },
+  arcticFrost: {
+    label: 'Arctic Frost',
+    background: '#F0F9FF',
+    title: '#0284C7',
+    typeBoxText: '#0369A1',
+    stats: '#0284C7',
+    keyboardBackground: 'transparent',
+    keyBackground: '#E0F2FE',
+    keyText: '#0369A1',
+    keyPressed: '#BAE6FD',
+    isDark: false
+  },
+  emberGlow: {
+    label: 'Ember Glow',
+    background: '#0C0A09',
+    title: '#F97316',
+    typeBoxText: '#FDBA74',
+    stats: '#F97316',
+    keyboardBackground: 'transparent',
+    keyBackground: '#1C1917',
+    keyText: '#FDBA74',
+    keyPressed: '#292524',
+    isDark: true
+  },
+  neonCity: {
+    label: 'Neon City',
+    background: '#0A0A0F',
+    title: '#8B5CF6',
+    typeBoxText: '#06B6D4',
+    stats: '#8B5CF6',
+    keyboardBackground: 'transparent',
+    keyBackground: '#1E1B4B',
+    keyText: '#06B6D4',
+    keyPressed: '#3730A3',
+    isDark: true
+  },
+  goldenHour: {
+    label: 'Golden Hour',
+    background: '#FFFBEB',
+    title: '#D97706',
+    typeBoxText: '#F59E0B',
+    stats: '#D97706',
+    keyboardBackground: 'transparent',
+    keyBackground: '#FEF3C7',
+    keyText: '#D97706',
+    keyPressed: '#FDE68A',
+    isDark: false
+  },
+  midnightOcean: {
+    label: 'Midnight Ocean',
+    background: '#0F172A',
+    title: '#06B6D4',
+    typeBoxText: '#67E8F9',
+    stats: '#06B6D4',
+    keyboardBackground: 'transparent',
+    keyBackground: '#1E293B',
+    keyText: '#67E8F9',
+    keyPressed: '#334155',
     isDark: true
   }
 };

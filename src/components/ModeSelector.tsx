@@ -14,31 +14,52 @@ export function ModeSelector({ settings, onSettingsChange, disabled }: ModeSelec
   const wordOptions = [10, 50, 100];
 
   return (
-    <div className="flex items-center gap-4 bg-muted/30 rounded-lg p-2">
+    <div 
+      className="flex items-center gap-4 rounded-lg p-2 border"
+      style={{ 
+        backgroundColor: 'rgba(255, 255, 255, 0.05)',
+        borderColor: 'var(--theme-stats)',
+        borderWidth: '1px'
+      }}
+    >
       {/* Mode Toggle */}
       <div className="flex items-center gap-1">
         <Button
-          variant={settings.mode === 'time' ? 'default' : 'ghost'}
+          variant="ghost"
           size="sm"
           onClick={() => onSettingsChange({ ...settings, mode: 'time', duration: 30 })}
           disabled={disabled}
-          className="px-4 h-8"
+          className="px-4 h-8 hover:bg-transparent"
+          style={{
+            backgroundColor: settings.mode === 'time' ? 'var(--theme-key-pressed)' : 'transparent',
+            color: settings.mode === 'time' ? 'var(--theme-title)' : 'var(--theme-typebox)',
+            borderColor: settings.mode === 'time' ? 'var(--theme-title)' : 'transparent'
+          }}
         >
           Time
         </Button>
         <Button
-          variant={settings.mode === 'words' ? 'default' : 'ghost'}
+          variant="ghost"
           size="sm"
           onClick={() => onSettingsChange({ ...settings, mode: 'words', duration: 50 })}
           disabled={disabled}
-          className="px-4 h-8"
+          className="px-4 h-8 hover:bg-transparent"
+          style={{
+            backgroundColor: settings.mode === 'words' ? 'var(--theme-key-pressed)' : 'transparent',
+            color: settings.mode === 'words' ? 'var(--theme-title)' : 'var(--theme-typebox)',
+            borderColor: settings.mode === 'words' ? 'var(--theme-title)' : 'transparent'
+          }}
         >
           Words
         </Button>
       </div>
 
       {/* Separator */}
-      <Separator orientation="vertical" className="h-8" />
+      <Separator 
+        orientation="vertical" 
+        className="h-8" 
+        style={{ backgroundColor: 'var(--theme-stats)', opacity: 0.3 }}
+      />
 
       {/* Duration Options */}
       <div className="flex items-center gap-1">
@@ -46,11 +67,16 @@ export function ModeSelector({ settings, onSettingsChange, disabled }: ModeSelec
           timeOptions.map((time) => (
             <Button
               key={time}
-              variant={settings.duration === time ? 'default' : 'ghost'}
+              variant="ghost"
               size="sm"
               onClick={() => onSettingsChange({ ...settings, duration: time })}
               disabled={disabled}
-              className="px-4 h-8"
+              className="px-4 h-8 hover:bg-transparent"
+              style={{
+                backgroundColor: settings.duration === time ? 'var(--theme-key-pressed)' : 'transparent',
+                color: settings.duration === time ? 'var(--theme-title)' : 'var(--theme-typebox)',
+                borderColor: settings.duration === time ? 'var(--theme-title)' : 'transparent'
+              }}
             >
               {time}
             </Button>
@@ -59,11 +85,16 @@ export function ModeSelector({ settings, onSettingsChange, disabled }: ModeSelec
           wordOptions.map((words) => (
             <Button
               key={words}
-              variant={settings.duration === words ? 'default' : 'ghost'}
+              variant="ghost"
               size="sm"
               onClick={() => onSettingsChange({ ...settings, duration: words })}
               disabled={disabled}
-              className="px-4 h-8"
+              className="px-4 h-8 hover:bg-transparent"
+              style={{
+                backgroundColor: settings.duration === words ? 'var(--theme-key-pressed)' : 'transparent',
+                color: settings.duration === words ? 'var(--theme-title)' : 'var(--theme-typebox)',
+                borderColor: settings.duration === words ? 'var(--theme-title)' : 'transparent'
+              }}
             >
               {words}
             </Button>
