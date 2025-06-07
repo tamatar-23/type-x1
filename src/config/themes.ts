@@ -37,30 +37,6 @@ export const themes: Record<string, Theme> = {
     keyPressed: '#B8B8B8',
     isDark: false
   },
-  mediumGray: {
-    label: 'Medium Gray',
-    background: '#D4D4D4',
-    title: '#2B2B2B',
-    typeBoxText: '#2B2B2B',
-    stats: '#2B2B2B',
-    keyboardBackground: 'transparent',
-    keyBackground: '#B8B8B8',
-    keyText: '#2B2B2B',
-    keyPressed: '#9C9C9C',
-    isDark: false
-  },
-  darkGray: {
-    label: 'Dark Gray',
-    background: '#B3B3B3',
-    title: '#2B2B2B',
-    typeBoxText: '#2B2B2B',
-    stats: '#2B2B2B',
-    keyboardBackground: 'transparent',
-    keyBackground: '#8A8A8A',
-    keyText: '#2B2B2B',
-    keyPressed: '#737373',
-    isDark: false
-  },
   lightBlue: {
     label: 'Light Blue',
     background: '#E3F2FD',
@@ -96,6 +72,90 @@ export const themes: Record<string, Theme> = {
     keyText: '#2E7D32',
     keyPressed: '#A5D6A7',
     isDark: false
+  },
+  oceanDark: {
+    label: 'Ocean Dark',
+    background: '#0F172A',
+    title: '#38BDF8',
+    typeBoxText: '#CBD5E1',
+    stats: '#38BDF8',
+    keyboardBackground: 'transparent',
+    keyBackground: '#1E293B',
+    keyText: '#94A3B8',
+    keyPressed: '#475569',
+    isDark: true
+  },
+  purpleHaze: {
+    label: 'Purple Haze',
+    background: '#1A0B2E',
+    title: '#A855F7',
+    typeBoxText: '#C4B5FD',
+    stats: '#A855F7',
+    keyboardBackground: 'transparent',
+    keyBackground: '#2D1B69',
+    keyText: '#DDD6FE',
+    keyPressed: '#4C1D95',
+    isDark: true
+  },
+  sunsetOrange: {
+    label: 'Sunset Orange',
+    background: '#FFF7ED',
+    title: '#EA580C',
+    typeBoxText: '#FB923C',
+    stats: '#EA580C',
+    keyboardBackground: 'transparent',
+    keyBackground: '#FED7AA',
+    keyText: '#EA580C',
+    keyPressed: '#FDC893',
+    isDark: false
+  },
+  mintFresh: {
+    label: 'Mint Fresh',
+    background: '#F0FDF4',
+    title: '#059669',
+    typeBoxText: '#10B981',
+    stats: '#059669',
+    keyboardBackground: 'transparent',
+    keyBackground: '#BBF7D0',
+    keyText: '#059669',
+    keyPressed: '#A7F3D0',
+    isDark: false
+  },
+  cyberpunkNeon: {
+    label: 'Cyberpunk Neon',
+    background: '#0C0C0C',
+    title: '#00FF9F',
+    typeBoxText: '#00FFFF',
+    stats: '#00FF9F',
+    keyboardBackground: 'transparent',
+    keyBackground: '#1A1A1A',
+    keyText: '#00FFFF',
+    keyPressed: '#333333',
+    isDark: true
+  },
+  rosePetals: {
+    label: 'Rose Petals',
+    background: '#FFF1F2',
+    title: '#E11D48',
+    typeBoxText: '#F43F5E',
+    stats: '#E11D48',
+    keyboardBackground: 'transparent',
+    keyBackground: '#FECDD3',
+    keyText: '#E11D48',
+    keyPressed: '#FDA4AF',
+    isDark: false
+  },
+  twilightPurple: {
+    label: 'Twilight Purple',
+    background: '#1E1B4B',
+    title: '#C084FC',
+    typeBoxText: '#DDD6FE',
+    stats: '#C084FC',
+    keyboardBackground: 'transparent',
+    keyBackground: '#312E81',
+    keyText: '#DDD6FE',
+    keyPressed: '#4338CA',
+    isDark: true
   }
 };
 

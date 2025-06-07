@@ -48,7 +48,7 @@ const Login = () => {
         style={{ color: 'var(--theme-stats)' }}
       >
         <ArrowLeft className="h-4 w-4" />
-        Back to TypeFlow
+        Back to Type.TMTR
       </Link>
 
       {/* Main login container */}
@@ -58,7 +58,7 @@ const Login = () => {
             className="text-4xl font-bold mb-2" 
             style={{ color: 'var(--theme-title)' }}
           >
-            TypeFlow
+            Type.TMTR
           </h1>
           <p 
             className="text-lg" 

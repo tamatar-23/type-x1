@@ -39,7 +39,7 @@ const User = () => {
             <div className="space-y-4">
               <h2 className="text-3xl font-bold" style={{ color: 'var(--theme-title)' }}>Guest Mode</h2>
               <p className="text-lg" style={{ color: 'var(--theme-stats)' }}>
-                You're currently using TypeFlow as a guest. Your test results are not being saved.
+                You're currently using Type.TMTR as a guest. Your test results are not being saved.
               </p>
               <p style={{ color: 'var(--theme-stats)' }}>
                 Create an account to track your progress, view detailed statistics, and see your improvement over time.

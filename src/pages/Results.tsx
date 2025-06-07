@@ -47,7 +47,7 @@ const Results = () => {
       {/* Header */}
       <header className="flex justify-between items-center p-6">
         <Link to="/" className="text-2xl font-bold" style={{ color: 'var(--theme-title)' }}>
-          TypeFlow
+          Type.TMTR
         </Link>
         <Button onClick={retryTest} variant="outline" className="bg-transparent border-opacity-60 hover:border-opacity-100 transition-opacity" style={{ borderColor: 'var(--theme-stats)', color: 'var(--theme-stats)' }}>
           <RotateCcw className="h-4 w-4 mr-2" />

@@ -79,7 +79,7 @@ const Index = () => {
       {/* Header with improved visibility */}
       <header className="flex justify-between items-center p-6">
         <Link to="/" className="text-2xl font-bold" style={{ color: 'var(--theme-title)' }}>
-          TypeFlow
+          Type.TMTR
         </Link>
         <Button 
           variant="ghost" 
