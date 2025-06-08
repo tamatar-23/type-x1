@@ -82,15 +82,16 @@ export const TypingArea: React.FC<TypingAreaProps> = ({
         className={`
           relative text-2xl leading-relaxed p-8 rounded-lg border-2 transition-all duration-200 
           ${isActive 
-            ? 'border-current border-opacity-20 bg-current bg-opacity-5' 
-            : 'border-current border-opacity-10 bg-current bg-opacity-5 cursor-pointer hover:border-opacity-20'
+            ? 'border-current border-opacity-20' 
+            : 'border-current border-opacity-10 cursor-pointer hover:border-opacity-20'
           }
           focus:outline-none font-medium
         `}
         style={{ 
           minHeight: '200px',
           color: 'var(--theme-typebox)',
-          fontFamily: 'Atkinson Hyperlegible, sans-serif'
+          fontFamily: 'Atkinson Hyperlegible, sans-serif',
+          backgroundColor: 'transparent'
         }}
         tabIndex={0}
         onClick={onActivate}
@@ -118,7 +119,7 @@ export const TypingArea: React.FC<TypingAreaProps> = ({
         </div>
         
         {!isActive && (
-          <div className="absolute inset-0 flex items-center justify-center bg-current bg-opacity-5 rounded-lg">
+          <div className="absolute inset-0 flex items-center justify-center rounded-lg">
             <div className="text-center" style={{ color: 'var(--theme-typebox)' }}>
               <MousePointer className="mx-auto mb-2 h-6 w-6" />
               <div className="font-bold text-lg">Click to focus</div>
