@@ -42,8 +42,13 @@ const Results = () => {
     navigate('/');
   };
 
+  const formatTooltipLabel = (value: any) => {
+    const timeValue = Number(value);
+    return isNaN(timeValue) ? 'Time: 0s' : `Time: ${Math.round(timeValue)}s`;
+  };
+
   const formatTooltipValue = (value: any) => {
-    return [`${value} WPM`, ''];
+    return [`${value}`, 'WPM'];
   };
 
   return (
@@ -62,44 +67,44 @@ const Results = () => {
       {/* Results Content */}
       <main className="container mx-auto px-6 py-8">
         <div className="max-w-6xl mx-auto">
-          {/* Main Stats - Full Height Layout */}
-          <div className="flex justify-center items-center gap-16 mb-12 min-h-[200px]">
-            <div className="text-center flex flex-col justify-center h-full">
-              <div className="text-8xl font-bold mb-4" style={{ color: 'var(--theme-title)' }}>{result.wpm}</div>
-              <div className="text-2xl" style={{ color: 'var(--theme-stats)' }}>wpm</div>
+          {/* Main Stats */}
+          <div className="flex justify-center items-start gap-16 mb-12">
+            <div className="text-center">
+              <div className="text-6xl font-bold mb-2" style={{ color: 'var(--theme-title)' }}>{result.wpm}</div>
+              <div className="text-lg" style={{ color: 'var(--theme-stats)' }}>wpm</div>
             </div>
             
-            <div className="text-center flex flex-col justify-center h-full">
-              <div className="text-8xl font-bold mb-4" style={{ color: 'var(--theme-title)' }}>{result.accuracy}%</div>
-              <div className="text-2xl" style={{ color: 'var(--theme-stats)' }}>acc</div>
+            <div className="text-center">
+              <div className="text-6xl font-bold mb-2" style={{ color: 'var(--theme-title)' }}>{result.accuracy}%</div>
+              <div className="text-lg" style={{ color: 'var(--theme-stats)' }}>acc</div>
             </div>
           </div>
 
-          {/* Secondary Stats - Full Width with Equal Spacing */}
-          <div className="flex justify-between items-center mb-12 w-full px-4" style={{ color: 'var(--theme-stats)' }}>
-            <div className="text-center flex-1">
+          {/* Secondary Stats - Fixed spacing with grid */}
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-6 mb-12 max-w-4xl mx-auto" style={{ color: 'var(--theme-stats)' }}>
+            <div className="text-center">
               <div className="text-sm mb-1">test type</div>
               <div style={{ color: 'var(--theme-title)' }}>
                 {result.settings.mode === 'time' ? `time ${result.settings.duration}` : `words ${result.settings.duration}`}
               </div>
             </div>
             
-            <div className="text-center flex-1">
+            <div className="text-center">
               <div className="text-sm mb-1">raw</div>
               <div style={{ color: 'var(--theme-title)' }}>{Math.round(result.wpm * 1.2)}</div>
             </div>
             
-            <div className="text-center flex-1">
+            <div className="text-center">
               <div className="text-sm mb-1">characters</div>
               <div style={{ color: 'var(--theme-title)' }}>{result.correct}/{result.incorrect}/{result.missed}/{result.charCount}</div>
             </div>
             
-            <div className="text-center flex-1">
+            <div className="text-center">
               <div className="text-sm mb-1">consistency</div>
               <div style={{ color: 'var(--theme-title)' }}>{Math.round(result.accuracy * 0.9)}%</div>
             </div>
             
-            <div className="text-center flex-1">
+            <div className="text-center">
               <div className="text-sm mb-1">time</div>
               <div style={{ color: 'var(--theme-title)' }}>{Math.round(result.totalTime)}s</div>
             </div>
@@ -119,8 +124,8 @@ const Results = () => {
                     />
                     <YAxis stroke="var(--theme-stats)" />
                     <Tooltip 
+                      labelFormatter={formatTooltipLabel}
                       formatter={formatTooltipValue}
-                      labelFormatter={() => ''}
                       contentStyle={{ 
                         backgroundColor: 'var(--theme-background)', 
                         border: `1px solid var(--theme-stats)`,

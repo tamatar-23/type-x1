@@ -21,22 +21,27 @@ export function ResultsDisplay({ result, onRestart }: ResultsDisplayProps) {
   console.log('ResultsDisplay - WPM History:', result.wpmHistory);
   console.log('ResultsDisplay - Full result:', result);
 
+  const formatTooltipLabel = (value: any) => {
+    const timeValue = Number(value);
+    return isNaN(timeValue) ? 'Time: 0s' : `Time: ${Math.round(timeValue)}s`;
+  };
+
   const formatTooltipValue = (value: any) => {
-    return [`${value} WPM`, ''];
+    return [`${value}`, 'WPM'];
   };
 
   return (
     <div className="max-w-7xl mx-auto space-y-12 animate-fade-in pt-8">
-      {/* Main WPM and Accuracy - Full Height Layout */}
+      {/* Main WPM and Accuracy on left, Graph on right */}
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-8 mb-12">
-        {/* Left side - WPM and Accuracy - Full Height */}
-        <div className="space-y-8 px-2 flex flex-col justify-center min-h-[300px]">
+        {/* Left side - WPM and Accuracy - smaller space */}
+        <div className="space-y-6 px-2">
           <div className="animate-scale-in" style={{ animationDelay: '0.1s' }}>
             <div className="text-left">
-              <div className="text-lg opacity-75 mb-3" style={{ color: 'var(--theme-stats)' }}>
+              <div className="text-sm opacity-75 mb-2" style={{ color: 'var(--theme-stats)' }}>
                 wpm
               </div>
-              <div className="text-7xl font-bold" style={{ color: 'var(--theme-stats)' }}>
+              <div className="text-5xl font-bold" style={{ color: 'var(--theme-stats)' }}>
                 {result.wpm}
               </div>
             </div>
@@ -44,10 +49,10 @@ export function ResultsDisplay({ result, onRestart }: ResultsDisplayProps) {
           
           <div className="animate-scale-in" style={{ animationDelay: '0.2s' }}>
             <div className="text-left">
-              <div className="text-lg opacity-75 mb-3" style={{ color: 'var(--theme-stats)' }}>
+              <div className="text-sm opacity-75 mb-2" style={{ color: 'var(--theme-stats)' }}>
                 acc
               </div>
-              <div className="text-7xl font-bold" style={{ color: 'var(--theme-stats)' }}>
+              <div className="text-5xl font-bold" style={{ color: 'var(--theme-stats)' }}>
                 {result.accuracy}%
               </div>
             </div>
@@ -77,7 +82,7 @@ export function ResultsDisplay({ result, onRestart }: ResultsDisplayProps) {
                   />
                   <ChartTooltip 
                     content={<ChartTooltipContent />}
-                    labelFormatter={() => ''}
+                    labelFormatter={formatTooltipLabel}
                     formatter={formatTooltipValue}
                   />
                   <Line 
@@ -105,11 +110,12 @@ export function ResultsDisplay({ result, onRestart }: ResultsDisplayProps) {
         </div>
       </div>
 
-      {/* Bottom section - Test info and detailed stats - Full Width Equal Spacing */}
+      {/* Bottom section - Test info and detailed stats */}
       <div className="space-y-8 px-4">
+        {/* Test type and detailed stats - Fixed spacing with grid */}
         <div className="animate-fade-in" style={{ animationDelay: '0.4s' }}>
-          <div className="flex justify-between items-center w-full">
-            <div className="text-center flex-1">
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-6 text-left justify-center max-w-4xl mx-auto">
+            <div>
               <div className="text-sm opacity-75 mb-1" style={{ color: 'var(--theme-stats)' }}>
                 test type
               </div>
@@ -121,7 +127,7 @@ export function ResultsDisplay({ result, onRestart }: ResultsDisplayProps) {
               </div>
             </div>
             
-            <div className="text-center flex-1">
+            <div>
               <div className="text-sm opacity-75 mb-1" style={{ color: 'var(--theme-stats)' }}>
                 raw
               </div>
@@ -130,7 +136,7 @@ export function ResultsDisplay({ result, onRestart }: ResultsDisplayProps) {
               </div>
             </div>
 
-            <div className="text-center flex-1">
+            <div>
               <div className="text-sm opacity-75 mb-1" style={{ color: 'var(--theme-stats)' }}>
                 characters
               </div>
@@ -139,7 +145,7 @@ export function ResultsDisplay({ result, onRestart }: ResultsDisplayProps) {
               </div>
             </div>
             
-            <div className="text-center flex-1">
+            <div>
               <div className="text-sm opacity-75 mb-1" style={{ color: 'var(--theme-stats)' }}>
                 consistency
               </div>
@@ -148,7 +154,7 @@ export function ResultsDisplay({ result, onRestart }: ResultsDisplayProps) {
               </div>
             </div>
             
-            <div className="text-center flex-1">
+            <div>
               <div className="text-sm opacity-75 mb-1" style={{ color: 'var(--theme-stats)' }}>
                 time
               </div>
