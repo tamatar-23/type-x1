@@ -42,11 +42,6 @@ const Results = () => {
     navigate('/');
   };
 
-  const formatTooltipLabel = (value: any) => {
-    const timeValue = Number(value);
-    return isNaN(timeValue) ? 'Time: 0s' : `Time: ${Math.round(timeValue)}s`;
-  };
-
   const formatTooltipValue = (value: any) => {
     return [`${value}`, 'WPM'];
   };
@@ -67,85 +62,92 @@ const Results = () => {
       {/* Results Content */}
       <main className="container mx-auto px-6 py-8">
         <div className="max-w-6xl mx-auto">
-          {/* Main Stats */}
-          <div className="flex justify-center items-start gap-16 mb-12">
-            <div className="text-center">
-              <div className="text-6xl font-bold mb-2" style={{ color: 'var(--theme-title)' }}>{result.wpm}</div>
-              <div className="text-lg" style={{ color: 'var(--theme-stats)' }}>wpm</div>
+          {/* Main Layout - Left side WPM/Accuracy, Right side Graph */}
+          <div className="grid grid-cols-1 lg:grid-cols-4 gap-8 mb-12">
+            {/* Left side - WPM and Accuracy - full height with larger fonts */}
+            <div className="lg:col-span-1 flex flex-col justify-center space-y-8">
+              <div className="text-center">
+                <div className="text-8xl font-bold mb-2" style={{ color: 'var(--theme-title)' }}>{result.wpm}</div>
+                <div className="text-xl" style={{ color: 'var(--theme-stats)' }}>wpm</div>
+              </div>
+              
+              <div className="text-center">
+                <div className="text-8xl font-bold mb-2" style={{ color: 'var(--theme-title)' }}>{result.accuracy}%</div>
+                <div className="text-xl" style={{ color: 'var(--theme-stats)' }}>acc</div>
+              </div>
             </div>
-            
-            <div className="text-center">
-              <div className="text-6xl font-bold mb-2" style={{ color: 'var(--theme-title)' }}>{result.accuracy}%</div>
-              <div className="text-lg" style={{ color: 'var(--theme-stats)' }}>acc</div>
+
+            {/* Right side - WPM Chart */}
+            <div className="lg:col-span-3">
+              {result.wpmHistory && result.wpmHistory.length > 1 && (
+                <div className="rounded-lg p-6 h-full" style={{ backgroundColor: 'rgba(180, 180, 180, 0.05)' }}>
+                  <div className="h-[400px]">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <LineChart data={result.wpmHistory}>
+                        <CartesianGrid strokeDasharray="3 3" stroke="var(--theme-stats)" opacity={0.3} />
+                        <XAxis 
+                          dataKey="time" 
+                          tickFormatter={(value) => `${Math.round(Number(value) || 0)}s`}
+                          stroke="var(--theme-stats)"
+                        />
+                        <YAxis stroke="var(--theme-stats)" />
+                        <Tooltip 
+                          formatter={formatTooltipValue}
+                          labelStyle={{ display: 'none' }}
+                          contentStyle={{ 
+                            backgroundColor: 'var(--theme-background)', 
+                            border: `1px solid var(--theme-stats)`,
+                            borderRadius: '6px',
+                            color: 'var(--theme-typebox)'
+                          }}
+                        />
+                        <Line 
+                          type="monotone" 
+                          dataKey="wpm" 
+                          stroke="var(--theme-title)" 
+                          strokeWidth={2}
+                          dot={false}
+                          activeDot={{ r: 4, fill: 'var(--theme-title)' }}
+                        />
+                      </LineChart>
+                    </ResponsiveContainer>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
 
-          {/* Secondary Stats - Fixed spacing with grid */}
-          <div className="grid grid-cols-2 md:grid-cols-5 gap-6 mb-12 max-w-4xl mx-auto" style={{ color: 'var(--theme-stats)' }}>
-            <div className="text-center">
-              <div className="text-sm mb-1">test type</div>
-              <div style={{ color: 'var(--theme-title)' }}>
-                {result.settings.mode === 'time' ? `time ${result.settings.duration}` : `words ${result.settings.duration}`}
+          {/* Secondary Stats - Full width with equal spacing */}
+          <div className="w-full mb-12">
+            <div className="flex justify-between items-center w-full px-4" style={{ color: 'var(--theme-stats)' }}>
+              <div className="text-center flex-1">
+                <div className="text-sm mb-1">test type</div>
+                <div style={{ color: 'var(--theme-title)' }}>
+                  {result.settings.mode === 'time' ? `time ${result.settings.duration}` : `words ${result.settings.duration}`}
+                </div>
               </div>
-            </div>
-            
-            <div className="text-center">
-              <div className="text-sm mb-1">raw</div>
-              <div style={{ color: 'var(--theme-title)' }}>{Math.round(result.wpm * 1.2)}</div>
-            </div>
-            
-            <div className="text-center">
-              <div className="text-sm mb-1">characters</div>
-              <div style={{ color: 'var(--theme-title)' }}>{result.correct}/{result.incorrect}/{result.missed}/{result.charCount}</div>
-            </div>
-            
-            <div className="text-center">
-              <div className="text-sm mb-1">consistency</div>
-              <div style={{ color: 'var(--theme-title)' }}>{Math.round(result.accuracy * 0.9)}%</div>
-            </div>
-            
-            <div className="text-center">
-              <div className="text-sm mb-1">time</div>
-              <div style={{ color: 'var(--theme-title)' }}>{Math.round(result.totalTime)}s</div>
+              
+              <div className="text-center flex-1">
+                <div className="text-sm mb-1">raw</div>
+                <div style={{ color: 'var(--theme-title)' }}>{Math.round(result.wpm * 1.2)}</div>
+              </div>
+              
+              <div className="text-center flex-1">
+                <div className="text-sm mb-1">characters</div>
+                <div style={{ color: 'var(--theme-title)' }}>{result.correct}/{result.incorrect}/{result.missed}/{result.charCount}</div>
+              </div>
+              
+              <div className="text-center flex-1">
+                <div className="text-sm mb-1">consistency</div>
+                <div style={{ color: 'var(--theme-title)' }}>{Math.round(result.accuracy * 0.9)}%</div>
+              </div>
+              
+              <div className="text-center flex-1">
+                <div className="text-sm mb-1">time</div>
+                <div style={{ color: 'var(--theme-title)' }}>{Math.round(result.totalTime)}s</div>
+              </div>
             </div>
           </div>
-
-          {/* WPM Chart */}
-          {result.wpmHistory && result.wpmHistory.length > 1 && (
-            <div className="rounded-lg p-6" style={{ backgroundColor: 'rgba(180, 180, 180, 0.05)' }}>
-              <div className="h-[300px]">
-                <ResponsiveContainer width="100%" height="100%">
-                  <LineChart data={result.wpmHistory}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="var(--theme-stats)" opacity={0.3} />
-                    <XAxis 
-                      dataKey="time" 
-                      tickFormatter={(value) => `${Math.round(Number(value) || 0)}s`}
-                      stroke="var(--theme-stats)"
-                    />
-                    <YAxis stroke="var(--theme-stats)" />
-                    <Tooltip 
-                      labelFormatter={formatTooltipLabel}
-                      formatter={formatTooltipValue}
-                      contentStyle={{ 
-                        backgroundColor: 'var(--theme-background)', 
-                        border: `1px solid var(--theme-stats)`,
-                        borderRadius: '6px',
-                        color: 'var(--theme-typebox)'
-                      }}
-                    />
-                    <Line 
-                      type="monotone" 
-                      dataKey="wpm" 
-                      stroke="var(--theme-title)" 
-                      strokeWidth={2}
-                      dot={false}
-                      activeDot={{ r: 4, fill: 'var(--theme-title)' }}
-                    />
-                  </LineChart>
-                </ResponsiveContainer>
-              </div>
-            </div>
-          )}
 
           {/* Bottom Actions */}
           <div className="flex justify-center gap-4 mt-12">
