@@ -37,6 +37,7 @@ export function ThemeContextProvider({ children }: { children: React.ReactNode }
     root.style.setProperty('--theme-key-bg', themeConfig.keyBackground);
     root.style.setProperty('--theme-key-text', themeConfig.keyText);
     root.style.setProperty('--theme-key-pressed', themeConfig.keyPressed);
+    root.style.setProperty('--theme-cursor', themeConfig.cursor);
     
     // Apply shadcn theme class for UI components
     root.classList.remove('light', 'dark');

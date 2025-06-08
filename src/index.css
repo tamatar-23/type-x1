@@ -14,6 +14,7 @@
   --theme-key-bg: #404040;
   --theme-key-text: #FFFFFF;
   --theme-key-pressed: #606060;
+  --theme-cursor: #FFFFFF;
 }
 
 @layer base {

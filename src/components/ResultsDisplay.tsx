@@ -21,6 +21,15 @@ export function ResultsDisplay({ result, onRestart }: ResultsDisplayProps) {
   console.log('ResultsDisplay - WPM History:', result.wpmHistory);
   console.log('ResultsDisplay - Full result:', result);
 
+  const formatTooltipLabel = (value: any) => {
+    const timeValue = Number(value);
+    return isNaN(timeValue) ? 'Time: 0s' : `Time: ${Math.round(timeValue)}s`;
+  };
+
+  const formatTooltipValue = (value: any) => {
+    return [`${value}`, 'WPM'];
+  };
+
   return (
     <div className="max-w-7xl mx-auto space-y-12 animate-fade-in pt-8">
       {/* Main WPM and Accuracy on left, Graph on right */}
@@ -63,7 +72,7 @@ export function ResultsDisplay({ result, onRestart }: ResultsDisplayProps) {
                   />
                   <XAxis 
                     dataKey="time" 
-                    tickFormatter={(value) => `${Math.round(value)}s`}
+                    tickFormatter={(value) => `${Math.round(Number(value) || 0)}s`}
                     stroke="var(--theme-stats)"
                     fontSize={12}
                   />
@@ -73,8 +82,8 @@ export function ResultsDisplay({ result, onRestart }: ResultsDisplayProps) {
                   />
                   <ChartTooltip 
                     content={<ChartTooltipContent />}
-                    labelFormatter={(value) => `Time: ${Math.round(Number(value))}s`}
-                    formatter={(value) => [`${value} WPM`, 'WPM']}
+                    labelFormatter={formatTooltipLabel}
+                    formatter={formatTooltipValue}
                   />
                   <Line 
                     type="monotone" 
@@ -103,7 +112,7 @@ export function ResultsDisplay({ result, onRestart }: ResultsDisplayProps) {
 
       {/* Bottom section - Test info and detailed stats */}
       <div className="space-y-8 px-4">
-        {/* Test type and detailed stats */}
+        {/* Test type and detailed stats - Fixed spacing with grid */}
         <div className="animate-fade-in" style={{ animationDelay: '0.4s' }}>
           <div className="grid grid-cols-2 md:grid-cols-5 gap-6 text-left justify-center max-w-4xl mx-auto">
             <div>

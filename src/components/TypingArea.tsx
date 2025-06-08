@@ -1,3 +1,4 @@
+
 import { useRef, useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Character } from '@/types/typing';
@@ -79,7 +80,7 @@ export function TypingArea({
   }, [currentIndex, text, userInput, onInput, onSpaceSkip]);
 
   const getCharStyle = (char: Character, index: number) => {
-    let baseStyle = "relative text-2xl font-atkinson font-bold";
+    let baseStyle = "relative text-2xl font-atkinson font-medium";
     
     switch (char.status) {
       case 'correct':
@@ -136,7 +137,7 @@ export function TypingArea({
   const visibleCharacters = characters.slice(visibleStartIndex, visibleStartIndex + visibleText.length);
 
   return (
-    <div className="relative w-full max-w-4xl mx-auto">
+    <div className="relative w-full max-w-4xl mx-auto mt-8">
       <input
         ref={inputRef}
         type="text"
@@ -153,7 +154,7 @@ export function TypingArea({
       />
       
       <div 
-        className="relative font-atkinson font-bold text-2xl leading-relaxed p-8 min-h-[200px] cursor-text focus-within:outline-none"
+        className="relative font-atkinson font-medium text-2xl leading-relaxed p-8 min-h-[200px] cursor-text focus-within:outline-none"
         onClick={handleContainerClick}
         style={{ color: 'var(--theme-typebox)' }}
       >
@@ -216,7 +217,14 @@ export function TypingArea({
                           >
                             {char}
                             {globalIndex === currentIndex && isFocused && (
-                              <span className="absolute top-0 left-0 w-0.5 h-5 bg-yellow-400 animate-pulse"></span>
+                              <span 
+                                className="absolute w-0.5 h-6 animate-pulse"
+                                style={{ 
+                                  backgroundColor: 'var(--theme-cursor)',
+                                  top: '2px',
+                                  left: '0'
+                                }}
+                              ></span>
                             )}
                           </span>
                         );
@@ -232,7 +240,14 @@ export function TypingArea({
                         >
                           {'\u00A0'}
                           {wordStartIndex + word.length === currentIndex && isFocused && (
-                            <span className="absolute top-0 left-0 w-0.5 h-5 bg-yellow-400 animate-pulse"></span>
+                            <span 
+                              className="absolute w-0.5 h-6 animate-pulse"
+                              style={{ 
+                                backgroundColor: 'var(--theme-cursor)',
+                                top: '2px',
+                                left: '0'
+                              }}
+                            ></span>
                           )}
                         </span>
                       ) : null}

@@ -42,6 +42,15 @@ const Results = () => {
     navigate('/');
   };
 
+  const formatTooltipLabel = (value: any) => {
+    const timeValue = Number(value);
+    return isNaN(timeValue) ? 'Time: 0s' : `Time: ${Math.round(timeValue)}s`;
+  };
+
+  const formatTooltipValue = (value: any) => {
+    return [`${value}`, 'WPM'];
+  };
+
   return (
     <div className="min-h-screen" style={{ backgroundColor: 'var(--theme-background)', color: 'var(--theme-typebox)' }}>
       {/* Header */}
@@ -71,8 +80,8 @@ const Results = () => {
             </div>
           </div>
 
-          {/* Secondary Stats */}
-          <div className="flex justify-center items-center gap-12 mb-12" style={{ color: 'var(--theme-stats)' }}>
+          {/* Secondary Stats - Fixed spacing with grid */}
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-6 mb-12 max-w-4xl mx-auto" style={{ color: 'var(--theme-stats)' }}>
             <div className="text-center">
               <div className="text-sm mb-1">test type</div>
               <div style={{ color: 'var(--theme-title)' }}>
@@ -110,13 +119,13 @@ const Results = () => {
                     <CartesianGrid strokeDasharray="3 3" stroke="var(--theme-stats)" opacity={0.3} />
                     <XAxis 
                       dataKey="time" 
-                      tickFormatter={(value) => `${Math.round(value)}s`}
+                      tickFormatter={(value) => `${Math.round(Number(value) || 0)}s`}
                       stroke="var(--theme-stats)"
                     />
                     <YAxis stroke="var(--theme-stats)" />
                     <Tooltip 
-                      labelFormatter={(value) => `Time: ${Math.round(Number(value))}s`}
-                      formatter={(value) => [`${value} WPM`, 'WPM']}
+                      labelFormatter={formatTooltipLabel}
+                      formatter={formatTooltipValue}
                       contentStyle={{ 
                         backgroundColor: 'var(--theme-background)', 
                         border: `1px solid var(--theme-stats)`,

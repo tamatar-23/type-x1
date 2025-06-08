@@ -9,6 +9,7 @@ export interface Theme {
   keyBackground: string;
   keyText: string;
   keyPressed: string;
+  cursor: string;
   isDark?: boolean;
 }
 
@@ -23,6 +24,7 @@ export const themes: Record<string, Theme> = {
     keyBackground: '#404040',
     keyText: '#FFFFFF',
     keyPressed: '#606060',
+    cursor: '#FFFFFF',
     isDark: true
   },
   lightGray: {
@@ -35,6 +37,7 @@ export const themes: Record<string, Theme> = {
     keyBackground: '#E5E5E5',
     keyText: '#2B2B2B',
     keyPressed: '#B8B8B8',
+    cursor: '#2B2B2B',
     isDark: false
   },
   oceanDark: {
@@ -47,6 +50,7 @@ export const themes: Record<string, Theme> = {
     keyBackground: '#1E293B',
     keyText: '#94A3B8',
     keyPressed: '#475569',
+    cursor: '#38BDF8',
     isDark: true
   },
   purpleHaze: {
@@ -59,6 +63,7 @@ export const themes: Record<string, Theme> = {
     keyBackground: '#2D1B69',
     keyText: '#DDD6FE',
     keyPressed: '#4C1D95',
+    cursor: '#A855F7',
     isDark: true
   },
   sunsetOrange: {
@@ -71,6 +76,7 @@ export const themes: Record<string, Theme> = {
     keyBackground: '#FED7AA',
     keyText: '#EA580C',
     keyPressed: '#FDC893',
+    cursor: '#EA580C',
     isDark: false
   },
   mintFresh: {
@@ -83,6 +89,7 @@ export const themes: Record<string, Theme> = {
     keyBackground: '#BBF7D0',
     keyText: '#059669',
     keyPressed: '#A7F3D0',
+    cursor: '#059669',
     isDark: false
   },
   cyberpunkNeon: {
@@ -95,6 +102,7 @@ export const themes: Record<string, Theme> = {
     keyBackground: '#1A1A1A',
     keyText: '#00FFFF',
     keyPressed: '#333333',
+    cursor: '#00FF9F',
     isDark: true
   },
   rosePetals: {
@@ -107,6 +115,7 @@ export const themes: Record<string, Theme> = {
     keyBackground: '#FECDD3',
     keyText: '#E11D48',
     keyPressed: '#FDA4AF',
+    cursor: '#E11D48',
     isDark: false
   },
   twilightPurple: {
@@ -119,6 +128,7 @@ export const themes: Record<string, Theme> = {
     keyBackground: '#312E81',
     keyText: '#DDD6FE',
     keyPressed: '#4338CA',
+    cursor: '#C084FC',
     isDark: true
   },
   arcticFrost: {
@@ -131,6 +141,7 @@ export const themes: Record<string, Theme> = {
     keyBackground: '#E0F2FE',
     keyText: '#0369A1',
     keyPressed: '#BAE6FD',
+    cursor: '#0284C7',
     isDark: false
   },
   emberGlow: {
@@ -143,6 +154,7 @@ export const themes: Record<string, Theme> = {
     keyBackground: '#1C1917',
     keyText: '#FDBA74',
     keyPressed: '#292524',
+    cursor: '#F97316',
     isDark: true
   },
   neonCity: {
@@ -155,6 +167,7 @@ export const themes: Record<string, Theme> = {
     keyBackground: '#1E1B4B',
     keyText: '#06B6D4',
     keyPressed: '#3730A3',
+    cursor: '#8B5CF6',
     isDark: true
   },
   goldenHour: {
@@ -167,6 +180,7 @@ export const themes: Record<string, Theme> = {
     keyBackground: '#FEF3C7',
     keyText: '#D97706',
     keyPressed: '#FDE68A',
+    cursor: '#D97706',
     isDark: false
   },
   midnightOcean: {
@@ -179,6 +193,7 @@ export const themes: Record<string, Theme> = {
     keyBackground: '#1E293B',
     keyText: '#67E8F9',
     keyPressed: '#334155',
+    cursor: '#06B6D4',
     isDark: true
   }
 };
