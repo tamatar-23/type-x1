@@ -74,6 +74,20 @@ const Index = () => {
     }
   };
 
+  const handleTypingAreaActivate = () => {
+    // This will be handled by the typing area when clicked
+  };
+
+  const handleKeyPress = (key: string) => {
+    if (key === 'Backspace') {
+      const newInput = userInput.slice(0, -1);
+      handleInput(newInput);
+    } else if (key.length === 1) {
+      const newInput = userInput + key;
+      handleInput(newInput);
+    }
+  };
+
   return (
     <div className="min-h-screen text-foreground" style={{ backgroundColor: 'var(--theme-background)' }}>
       {/* Header with improved visibility */}
@@ -124,13 +138,11 @@ const Index = () => {
               <div className="flex justify-center px-6">
                 <div className="w-full max-w-4xl">
                   <TypingArea
-                    text={text}
                     characters={characters}
                     currentIndex={currentIndex}
-                    userInput={userInput}
-                    onInput={handleInput}
-                    onSpaceSkip={handleSpaceSkip}
-                    isFinished={isFinished}
+                    isActive={isActive}
+                    onActivate={handleTypingAreaActivate}
+                    onKeyPress={handleKeyPress}
                   />
                 </div>
               </div>
