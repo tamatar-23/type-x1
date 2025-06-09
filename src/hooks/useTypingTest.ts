@@ -1,6 +1,8 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { TestSettings, TypingStats, Character, TestResult } from '@/types/typing';
 import { generateText } from '@/utils/words';
+import { firestoreService } from '@/services/firestore';
+import { useAuth } from '@/hooks/useAuth';
 
 // Get saved settings or default
 const getSavedSettings = (): TestSettings => {
@@ -20,6 +22,7 @@ const getSavedSettings = (): TestSettings => {
 };
 
 export function useTypingTest(settings: TestSettings) {
+  const { user } = useAuth();
   const [text, setText] = useState('');
   const [userInput, setUserInput] = useState('');
   const [characters, setCharacters] = useState<Character[]>([]);
@@ -37,6 +40,7 @@ export function useTypingTest(settings: TestSettings) {
     charCount: 0
   });
   const [wpmHistory, setWpmHistory] = useState<{ time: number; wpm: number }[]>([]);
+  const [isSaving, setIsSaving] = useState(false);
   
   const startTime = useRef<number>(0);
   const intervalRef = useRef<NodeJS.Timeout>();
@@ -110,13 +114,28 @@ export function useTypingTest(settings: TestSettings) {
     };
   }, []);
 
-  const finishTest = useCallback(() => {
+  const finishTest = useCallback(async () => {
     console.log('Finishing test...');
     setIsFinished(true);
     setIsActive(false);
     if (intervalRef.current) clearInterval(intervalRef.current);
     if (wpmIntervalRef.current) clearInterval(wpmIntervalRef.current);
-  }, []);
+
+    // Save result to Firestore if user is authenticated
+    if (user && !isSaving) {
+      setIsSaving(true);
+      try {
+        const result = getResult();
+        await firestoreService.saveTestResult(user.uid, result);
+        console.log('Test result saved to Firestore');
+      } catch (error) {
+        console.error('Failed to save test result:', error);
+        // Continue anyway - don't block the user experience
+      } finally {
+        setIsSaving(false);
+      }
+    }
+  }, [user, isSaving]);
 
   const startTest = useCallback(() => {
     if (!isActive) {
@@ -219,6 +238,10 @@ export function useTypingTest(settings: TestSettings) {
       ...stats
     };
     console.log('Generated result:', result);
+    
+    // Also store in sessionStorage for immediate access on Results page
+    sessionStorage.setItem('lastResult', JSON.stringify(result));
+    
     return result;
   }, [settings, stats, wpmHistory]);
 
@@ -243,6 +266,7 @@ export function useTypingTest(settings: TestSettings) {
     timeLeft,
     stats,
     wpmHistory,
+    isSaving,
     handleInput,
     handleSpaceSkip,
     resetTest,

@@ -1,14 +1,67 @@
 
 import { Link } from 'react-router-dom';
+import { useState, useEffect } from 'react';
 import { ArrowLeft, TrendingUp, Clock, Target, Keyboard } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/hooks/useAuth';
+import { firestoreService, UserStats } from '@/services/firestore';
+import { FirestoreTestResult } from '@/services/firestore';
 
 const User = () => {
   const { user, loading, signInWithGoogle, signInWithGithub, signOut } = useAuth();
+  const [userStats, setUserStats] = useState<UserStats | null>(null);
+  const [recentTests, setRecentTests] = useState<(FirestoreTestResult & { id: string })[]>([]);
+  const [dataLoading, setDataLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  if (loading) {
+  // Fetch user data when authenticated
+  useEffect(() => {
+    const fetchUserData = async () => {
+      if (!user) return;
+      
+      setDataLoading(true);
+      setError(null);
+      
+      try {
+        const [stats, tests] = await Promise.all([
+          firestoreService.getUserStats(user.uid),
+          firestoreService.getRecentTests(user.uid, 10)
+        ]);
+        
+        setUserStats(stats);
+        setRecentTests(tests);
+      } catch (err) {
+        console.error('Error fetching user data:', err);
+        setError('Failed to load user data. Please try again.');
+      } finally {
+        setDataLoading(false);
+      }
+    };
+
+    if (user) {
+      fetchUserData();
+    }
+  }, [user]);
+
+  const formatTime = (seconds: number) => {
+    const hours = Math.floor(seconds / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
+    
+    if (hours > 0) {
+      return `${hours}h ${minutes}m`;
+    }
+    return `${minutes}m`;
+  };
+
+  const formatDate = (timestamp: any) => {
+    if (!timestamp) return 'Unknown';
+    
+    const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
+    return date.toLocaleDateString();
+  };
+
+  if (loading || dataLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: 'var(--theme-background)' }}>
         <div className="text-lg" style={{ color: 'var(--theme-stats)' }}>Loading...</div>
@@ -97,6 +150,13 @@ const User = () => {
             </div>
           </div>
 
+          {/* Error Message */}
+          {error && (
+            <div className="text-center py-4 text-red-500">
+              {error}
+            </div>
+          )}
+
           {/* Overview Cards */}
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <Card>
@@ -107,8 +167,12 @@ const User = () => {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-3xl font-bold" style={{ color: 'var(--theme-title)' }}>0</div>
-                <div className="text-xs" style={{ color: 'var(--theme-stats)' }}>No tests yet</div>
+                <div className="text-3xl font-bold" style={{ color: 'var(--theme-title)' }}>
+                  {userStats?.averageWPM || 0}
+                </div>
+                <div className="text-xs" style={{ color: 'var(--theme-stats)' }}>
+                  {userStats?.totalTests ? `${userStats.totalTests} tests` : 'No tests yet'}
+                </div>
               </CardContent>
             </Card>
 
@@ -120,8 +184,12 @@ const User = () => {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-3xl font-bold" style={{ color: 'var(--theme-title)' }}>0%</div>
-                <div className="text-xs" style={{ color: 'var(--theme-stats)' }}>No tests yet</div>
+                <div className="text-3xl font-bold" style={{ color: 'var(--theme-title)' }}>
+                  {userStats?.averageAccuracy || 0}%
+                </div>
+                <div className="text-xs" style={{ color: 'var(--theme-stats)' }}>
+                  {userStats?.totalTests ? `${userStats.totalTests} tests` : 'No tests yet'}
+                </div>
               </CardContent>
             </Card>
 
@@ -133,8 +201,12 @@ const User = () => {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-3xl font-bold" style={{ color: 'var(--theme-title)' }}>0h</div>
-                <div className="text-xs" style={{ color: 'var(--theme-stats)' }}>0 tests completed</div>
+                <div className="text-3xl font-bold" style={{ color: 'var(--theme-title)' }}>
+                  {userStats?.totalTime ? formatTime(userStats.totalTime) : '0h'}
+                </div>
+                <div className="text-xs" style={{ color: 'var(--theme-stats)' }}>
+                  {userStats?.totalTests || 0} tests completed
+                </div>
               </CardContent>
             </Card>
 
@@ -146,8 +218,12 @@ const User = () => {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-3xl font-bold" style={{ color: 'var(--theme-title)' }}>0</div>
-                <div className="text-xs" style={{ color: 'var(--theme-stats)' }}>No tests yet</div>
+                <div className="text-3xl font-bold" style={{ color: 'var(--theme-title)' }}>
+                  {userStats?.bestWPM || 0}
+                </div>
+                <div className="text-xs" style={{ color: 'var(--theme-stats)' }}>
+                  {userStats?.totalTests ? 'Personal best' : 'No tests yet'}
+                </div>
               </CardContent>
             </Card>
           </div>
@@ -158,10 +234,31 @@ const User = () => {
               <CardTitle style={{ color: 'var(--theme-title)' }}>Recent Tests</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-center py-8" style={{ color: 'var(--theme-stats)' }}>
-                <Keyboard className="mx-auto h-12 w-12 mb-4" />
-                <p>Your test history will appear here once you complete some tests</p>
-              </div>
+              {recentTests.length > 0 ? (
+                <div className="space-y-2">
+                  <div className="grid grid-cols-5 gap-4 pb-2 border-b border-border text-sm font-medium" style={{ color: 'var(--theme-stats)' }}>
+                    <div>Date</div>
+                    <div>WPM</div>
+                    <div>Accuracy</div>
+                    <div>Mode</div>
+                    <div>Time</div>
+                  </div>
+                  {recentTests.map((test) => (
+                    <div key={test.id} className="grid grid-cols-5 gap-4 py-2 text-sm" style={{ color: 'var(--theme-typebox)' }}>
+                      <div>{formatDate(test.createdAt)}</div>
+                      <div className="font-medium">{test.wpm}</div>
+                      <div>{test.accuracy}%</div>
+                      <div>{test.settings.mode} {test.settings.duration}</div>
+                      <div>{Math.round(test.totalTime)}s</div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-8" style={{ color: 'var(--theme-stats)' }}>
+                  <Keyboard className="mx-auto h-12 w-12 mb-4" />
+                  <p>Your test history will appear here once you complete some tests</p>
+                </div>
+              )}
             </CardContent>
           </Card>
         </div>

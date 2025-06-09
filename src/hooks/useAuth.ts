@@ -6,8 +6,8 @@ import {
   onAuthStateChanged,
   User 
 } from 'firebase/auth';
-import { doc, setDoc, getDoc } from 'firebase/firestore';
-import { auth, db, googleProvider, githubProvider } from '@/lib/firebase';
+import { auth, googleProvider, githubProvider } from '@/lib/firebase';
+import { firestoreService } from '@/services/firestore';
 import { useNavigate } from 'react-router-dom';
 
 export function useAuth() {
@@ -30,12 +30,15 @@ export function useAuth() {
       const result = await signInWithPopup(auth, googleProvider);
       console.log('Google sign-in successful:', result.user);
       
-      // Try to create user document, but don't block navigation if it fails
+      // Create user document in Firestore
       try {
-        await createUserDocument(result.user);
+        await firestoreService.createUserProfile(result.user.uid, {
+          displayName: result.user.displayName || '',
+          email: result.user.email || '',
+          photoURL: result.user.photoURL || ''
+        });
       } catch (docError: any) {
         console.warn('Failed to create user document (continuing anyway):', docError);
-        // Continue with navigation even if document creation fails
       }
       
       navigate('/user');
@@ -43,7 +46,6 @@ export function useAuth() {
     } catch (error: any) {
       console.error('Error signing in with Google:', error);
       
-      // Provide specific error messages
       if (error.code === 'auth/unauthorized-domain') {
         throw new Error('Domain not authorized. Please add this domain to Firebase authorized domains.');
       } else if (error.code === 'auth/popup-closed-by-user') {
@@ -62,12 +64,15 @@ export function useAuth() {
       const result = await signInWithPopup(auth, githubProvider);
       console.log('GitHub sign-in successful:', result.user);
       
-      // Try to create user document, but don't block navigation if it fails
+      // Create user document in Firestore
       try {
-        await createUserDocument(result.user);
+        await firestoreService.createUserProfile(result.user.uid, {
+          displayName: result.user.displayName || '',
+          email: result.user.email || '',
+          photoURL: result.user.photoURL || ''
+        });
       } catch (docError: any) {
         console.warn('Failed to create user document (continuing anyway):', docError);
-        // Continue with navigation even if document creation fails
       }
       
       navigate('/user');
@@ -75,7 +80,6 @@ export function useAuth() {
     } catch (error: any) {
       console.error('Error signing in with GitHub:', error);
       
-      // Provide specific error messages
       if (error.code === 'auth/unauthorized-domain') {
         throw new Error('Domain not authorized. Please add this domain to Firebase authorized domains.');
       } else if (error.code === 'auth/popup-closed-by-user') {
@@ -94,37 +98,6 @@ export function useAuth() {
       navigate('/');
     } catch (error) {
       console.error('Error signing out:', error);
-      throw error;
-    }
-  };
-
-  const createUserDocument = async (user: User) => {
-    if (!user) return;
-    
-    const userRef = doc(db, 'users', user.uid);
-    
-    try {
-      const userSnap = await getDoc(userRef);
-      
-      if (!userSnap.exists()) {
-        const { displayName, email, photoURL } = user;
-        const createdAt = new Date();
-        
-        await setDoc(userRef, {
-          displayName,
-          email,
-          photoURL,
-          createdAt,
-          totalTests: 0,
-          bestWPM: 0,
-          averageWPM: 0,
-          averageAccuracy: 0
-        });
-        console.log('User document created successfully');
-      }
-    } catch (error: any) {
-      console.error('Error with user document:', error);
-      // Re-throw the error so it can be caught by the calling function
       throw error;
     }
   };

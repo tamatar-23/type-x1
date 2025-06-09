@@ -45,6 +45,7 @@ const Index = () => {
     isFinished,
     timeLeft,
     stats,
+    isSaving,
     handleInput,
     handleSpaceSkip,
     resetTest,
@@ -81,15 +82,23 @@ const Index = () => {
         <Link to="/" className="text-2xl font-bold" style={{ color: 'var(--theme-title)' }}>
           Type.TMTR
         </Link>
-        <Button 
-          variant="ghost" 
-          size="icon"
-          className="hover:bg-white/10"
-          style={{ color: 'var(--theme-title)' }}
-          onClick={handleUserIconClick}
-        >
-          <User className="h-5 w-5" />
-        </Button>
+        <div className="flex items-center gap-4">
+          {/* Show saving status */}
+          {isSaving && (
+            <div className="text-sm" style={{ color: 'var(--theme-stats)' }}>
+              Saving...
+            </div>
+          )}
+          <Button 
+            variant="ghost" 
+            size="icon"
+            className="hover:bg-white/10"
+            style={{ color: 'var(--theme-title)' }}
+            onClick={handleUserIconClick}
+          >
+            <User className="h-5 w-5" />
+          </Button>
+        </div>
       </header>
 
       {/* Main Content */}
