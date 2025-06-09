@@ -1,263 +1,270 @@
 
-import { Link } from 'react-router-dom';
 import { useState, useEffect } from 'react';
-import { ArrowLeft, TrendingUp, Clock, Target, Keyboard } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { useNavigate } from 'react-router-dom';
+import { ArrowLeft, LogOut, User as UserIcon, Trophy, Target, Clock, TrendingUp } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Skeleton } from '@/components/ui/skeleton';
 import { useAuth } from '@/hooks/useAuth';
-import { firestoreService, UserStats } from '@/services/firestore';
-import { FirestoreTestResult } from '@/services/firestore';
+import { firestoreService, UserStats, FirestoreTestResult } from '@/services/firestore';
 
 const User = () => {
-  const { user, loading, signInWithGoogle, signInWithGithub, signOut } = useAuth();
-  const [userStats, setUserStats] = useState<UserStats | null>(null);
+  const navigate = useNavigate();
+  const { user, loading: authLoading, signOut } = useAuth();
+  const [stats, setStats] = useState<UserStats | null>(null);
   const [recentTests, setRecentTests] = useState<(FirestoreTestResult & { id: string })[]>([]);
-  const [dataLoading, setDataLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Fetch user data when authenticated
   useEffect(() => {
-    const fetchUserData = async () => {
-      if (!user) return;
-      
-      setDataLoading(true);
-      setError(null);
-      
-      try {
-        const [stats, tests] = await Promise.all([
-          firestoreService.getUserStats(user.uid),
-          firestoreService.getRecentTests(user.uid, 10)
-        ]);
-        
-        setUserStats(stats);
-        setRecentTests(tests);
-      } catch (err) {
-        console.error('Error fetching user data:', err);
-        setError('Failed to load user data. Please try again.');
-      } finally {
-        setDataLoading(false);
-      }
-    };
+    if (!authLoading && !user) {
+      navigate('/login');
+      return;
+    }
 
     if (user) {
       fetchUserData();
     }
-  }, [user]);
+  }, [user, authLoading, navigate]);
 
-  const formatTime = (seconds: number) => {
-    const hours = Math.floor(seconds / 3600);
-    const minutes = Math.floor((seconds % 3600) / 60);
-    
-    if (hours > 0) {
-      return `${hours}h ${minutes}m`;
+  const fetchUserData = async () => {
+    if (!user) return;
+
+    try {
+      console.log('Starting to fetch user data for:', user.uid);
+      setLoading(true);
+      setError(null);
+
+      // Fetch user stats
+      const userStats = await firestoreService.getUserStats(user.uid);
+      console.log('Fetched user stats:', userStats);
+      setStats(userStats);
+
+      // Fetch recent tests
+      const tests = await firestoreService.getRecentTests(user.uid, 5);
+      console.log('Fetched recent tests:', tests);
+      setRecentTests(tests);
+
+    } catch (error: any) {
+      console.error('Error fetching user data:', error);
+      setError(`Failed to load user data: ${error.message}`);
+    } finally {
+      setLoading(false);
     }
-    return `${minutes}m`;
   };
 
-  const formatDate = (timestamp: any) => {
-    if (!timestamp) return 'Unknown';
-    
-    const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
-    return date.toLocaleDateString();
+  const handleSignOut = async () => {
+    try {
+      await signOut();
+    } catch (error) {
+      console.error('Error signing out:', error);
+    }
   };
 
-  if (loading || dataLoading) {
+  if (authLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: 'var(--theme-background)' }}>
-        <div className="text-lg" style={{ color: 'var(--theme-stats)' }}>Loading...</div>
+      <div 
+        className="min-h-screen flex items-center justify-center" 
+        style={{ backgroundColor: 'var(--theme-background)' }}
+      >
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2" style={{ borderColor: 'var(--theme-title)' }}></div>
       </div>
     );
   }
 
   if (!user) {
-    return (
-      <div className="min-h-screen" style={{ backgroundColor: 'var(--theme-background)', color: 'var(--theme-typebox)' }}>
-        {/* Header */}
-        <header className="flex justify-between items-center p-6 border-b border-border">
-          <Link to="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity" style={{ color: 'var(--theme-stats)' }}>
-            <ArrowLeft className="h-4 w-4" />
-            Back to Test
-          </Link>
-          <h1 className="text-2xl font-bold" style={{ color: 'var(--theme-title)' }}>User Profile</h1>
-          <div></div>
-        </header>
-
-        {/* Guest Mode Message */}
-        <main className="container mx-auto px-6 py-12">
-          <div className="max-w-2xl mx-auto text-center space-y-6">
-            <div className="mx-auto w-24 h-24 rounded-full flex items-center justify-center" style={{ backgroundColor: 'rgba(180, 180, 180, 0.1)' }}>
-              <Keyboard className="h-12 w-12" style={{ color: 'var(--theme-stats)' }} />
-            </div>
-            
-            <div className="space-y-4">
-              <h2 className="text-3xl font-bold" style={{ color: 'var(--theme-title)' }}>Guest Mode</h2>
-              <p className="text-lg" style={{ color: 'var(--theme-stats)' }}>
-                You're currently using Type.TMTR as a guest. Your test results are not being saved.
-              </p>
-              <p style={{ color: 'var(--theme-stats)' }}>
-                Create an account to track your progress, view detailed statistics, and see your improvement over time.
-              </p>
-            </div>
-
-            <div className="flex flex-col sm:flex-row gap-4 justify-center pt-6">
-              <Button size="lg" onClick={signInWithGoogle}>
-                Sign Up with Google
-              </Button>
-              <Button variant="outline" size="lg" onClick={signInWithGithub}>
-                Sign Up with GitHub
-              </Button>
-            </div>
-          </div>
-        </main>
-      </div>
-    );
+    return null;
   }
 
-  // This is shown for logged-in users
   return (
     <div className="min-h-screen" style={{ backgroundColor: 'var(--theme-background)', color: 'var(--theme-typebox)' }}>
       {/* Header */}
-      <header className="flex justify-between items-center p-6 border-b border-border">
-        <Link to="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity" style={{ color: 'var(--theme-stats)' }}>
+      <header className="flex justify-between items-center p-6">
+        <Button 
+          variant="ghost" 
+          onClick={() => navigate('/')}
+          className="flex items-center gap-2 hover:bg-white/10"
+          style={{ color: 'var(--theme-title)' }}
+        >
           <ArrowLeft className="h-4 w-4" />
-          Back to Test
-        </Link>
-        <h1 className="text-2xl font-bold" style={{ color: 'var(--theme-title)' }}>
-          Welcome, {user.displayName}
-        </h1>
-        <Button variant="outline" size="sm" onClick={signOut}>
+          Back to Type.TMTR
+        </Button>
+        
+        <Button 
+          variant="outline" 
+          onClick={handleSignOut}
+          className="flex items-center gap-2"
+          style={{ 
+            borderColor: 'var(--theme-stats)',
+            color: 'var(--theme-typebox)',
+            backgroundColor: 'transparent'
+          }}
+        >
+          <LogOut className="h-4 w-4" />
           Sign Out
         </Button>
       </header>
 
-      {/* User Stats */}
-      <main className="container mx-auto px-6 py-12">
-        <div className="max-w-6xl mx-auto space-y-8">
+      {/* Main Content */}
+      <main className="container mx-auto px-6 py-8">
+        <div className="max-w-4xl mx-auto space-y-8">
           {/* User Info */}
-          <div className="flex items-center gap-4 mb-8">
-            {user.photoURL && (
+          <div className="flex items-center gap-4">
+            {user.photoURL ? (
               <img 
                 src={user.photoURL} 
-                alt={user.displayName || 'User'} 
+                alt="Profile" 
                 className="w-16 h-16 rounded-full"
               />
+            ) : (
+              <div 
+                className="w-16 h-16 rounded-full flex items-center justify-center"
+                style={{ backgroundColor: 'var(--theme-key-bg)' }}
+              >
+                <UserIcon className="h-8 w-8" style={{ color: 'var(--theme-key-text)' }} />
+              </div>
             )}
             <div>
-              <h2 className="text-2xl font-bold" style={{ color: 'var(--theme-title)' }}>
-                {user.displayName}
-              </h2>
-              <p style={{ color: 'var(--theme-stats)' }}>{user.email}</p>
+              <h1 className="text-3xl font-bold" style={{ color: 'var(--theme-title)' }}>
+                {user.displayName || 'Anonymous User'}
+              </h1>
+              <p style={{ color: 'var(--theme-stats)' }}>
+                {user.email}
+              </p>
             </div>
           </div>
 
-          {/* Error Message */}
+          {/* Error Display */}
           {error && (
-            <div className="text-center py-4 text-red-500">
-              {error}
-            </div>
+            <Card style={{ backgroundColor: 'rgba(239, 68, 68, 0.1)', borderColor: 'rgba(239, 68, 68, 0.3)' }}>
+              <CardContent className="p-4">
+                <p style={{ color: 'var(--theme-title)' }}>{error}</p>
+                <Button 
+                  onClick={fetchUserData}
+                  className="mt-2"
+                  variant="outline"
+                  style={{ 
+                    borderColor: 'var(--theme-stats)',
+                    color: 'var(--theme-typebox)',
+                    backgroundColor: 'transparent'
+                  }}
+                >
+                  Try Again
+                </Button>
+              </CardContent>
+            </Card>
           )}
 
-          {/* Overview Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <Card>
-              <CardHeader className="pb-3">
-                <CardTitle className="text-sm font-medium flex items-center gap-2" style={{ color: 'var(--theme-stats)' }}>
-                  <TrendingUp className="h-4 w-4" />
-                  Average WPM
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-3xl font-bold" style={{ color: 'var(--theme-title)' }}>
-                  {userStats?.averageWPM || 0}
-                </div>
-                <div className="text-xs" style={{ color: 'var(--theme-stats)' }}>
-                  {userStats?.totalTests ? `${userStats.totalTests} tests` : 'No tests yet'}
-                </div>
-              </CardContent>
-            </Card>
+          {/* Stats Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {loading ? (
+              Array.from({ length: 4 }).map((_, i) => (
+                <Card key={i} style={{ backgroundColor: 'var(--theme-key-bg)', borderColor: 'var(--theme-stats)' }}>
+                  <CardContent className="p-6">
+                    <Skeleton className="h-8 w-8 mb-2" />
+                    <Skeleton className="h-4 w-20 mb-1" />
+                    <Skeleton className="h-6 w-16" />
+                  </CardContent>
+                </Card>
+              ))
+            ) : (
+              <>
+                <Card style={{ backgroundColor: 'var(--theme-key-bg)', borderColor: 'var(--theme-stats)' }}>
+                  <CardContent className="p-6">
+                    <Trophy className="h-8 w-8 mb-2" style={{ color: 'var(--theme-title)' }} />
+                    <p className="text-sm" style={{ color: 'var(--theme-stats)' }}>Best WPM</p>
+                    <p className="text-2xl font-bold" style={{ color: 'var(--theme-title)' }}>
+                      {stats?.bestWPM || 0}
+                    </p>
+                  </CardContent>
+                </Card>
 
-            <Card>
-              <CardHeader className="pb-3">
-                <CardTitle className="text-sm font-medium flex items-center gap-2" style={{ color: 'var(--theme-stats)' }}>
-                  <Target className="h-4 w-4" />
-                  Average Accuracy
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-3xl font-bold" style={{ color: 'var(--theme-title)' }}>
-                  {userStats?.averageAccuracy || 0}%
-                </div>
-                <div className="text-xs" style={{ color: 'var(--theme-stats)' }}>
-                  {userStats?.totalTests ? `${userStats.totalTests} tests` : 'No tests yet'}
-                </div>
-              </CardContent>
-            </Card>
+                <Card style={{ backgroundColor: 'var(--theme-key-bg)', borderColor: 'var(--theme-stats)' }}>
+                  <CardContent className="p-6">
+                    <TrendingUp className="h-8 w-8 mb-2" style={{ color: 'var(--theme-title)' }} />
+                    <p className="text-sm" style={{ color: 'var(--theme-stats)' }}>Average WPM</p>
+                    <p className="text-2xl font-bold" style={{ color: 'var(--theme-title)' }}>
+                      {stats?.averageWPM || 0}
+                    </p>
+                  </CardContent>
+                </Card>
 
-            <Card>
-              <CardHeader className="pb-3">
-                <CardTitle className="text-sm font-medium flex items-center gap-2" style={{ color: 'var(--theme-stats)' }}>
-                  <Clock className="h-4 w-4" />
-                  Total Time
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-3xl font-bold" style={{ color: 'var(--theme-title)' }}>
-                  {userStats?.totalTime ? formatTime(userStats.totalTime) : '0h'}
-                </div>
-                <div className="text-xs" style={{ color: 'var(--theme-stats)' }}>
-                  {userStats?.totalTests || 0} tests completed
-                </div>
-              </CardContent>
-            </Card>
+                <Card style={{ backgroundColor: 'var(--theme-key-bg)', borderColor: 'var(--theme-stats)' }}>
+                  <CardContent className="p-6">
+                    <Target className="h-8 w-8 mb-2" style={{ color: 'var(--theme-title)' }} />
+                    <p className="text-sm" style={{ color: 'var(--theme-stats)' }}>Average Accuracy</p>
+                    <p className="text-2xl font-bold" style={{ color: 'var(--theme-title)' }}>
+                      {stats?.averageAccuracy || 0}%
+                    </p>
+                  </CardContent>
+                </Card>
 
-            <Card>
-              <CardHeader className="pb-3">
-                <CardTitle className="text-sm font-medium flex items-center gap-2" style={{ color: 'var(--theme-stats)' }}>
-                  <Keyboard className="h-4 w-4" />
-                  Best WPM
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-3xl font-bold" style={{ color: 'var(--theme-title)' }}>
-                  {userStats?.bestWPM || 0}
-                </div>
-                <div className="text-xs" style={{ color: 'var(--theme-stats)' }}>
-                  {userStats?.totalTests ? 'Personal best' : 'No tests yet'}
-                </div>
-              </CardContent>
-            </Card>
+                <Card style={{ backgroundColor: 'var(--theme-key-bg)', borderColor: 'var(--theme-stats)' }}>
+                  <CardContent className="p-6">
+                    <Clock className="h-8 w-8 mb-2" style={{ color: 'var(--theme-title)' }} />
+                    <p className="text-sm" style={{ color: 'var(--theme-stats)' }}>Tests Completed</p>
+                    <p className="text-2xl font-bold" style={{ color: 'var(--theme-title)' }}>
+                      {stats?.totalTests || 0}
+                    </p>
+                  </CardContent>
+                </Card>
+              </>
+            )}
           </div>
 
-          {/* Recent Tests Table */}
-          <Card>
+          {/* Recent Tests */}
+          <Card style={{ backgroundColor: 'var(--theme-key-bg)', borderColor: 'var(--theme-stats)' }}>
             <CardHeader>
               <CardTitle style={{ color: 'var(--theme-title)' }}>Recent Tests</CardTitle>
             </CardHeader>
             <CardContent>
-              {recentTests.length > 0 ? (
-                <div className="space-y-2">
-                  <div className="grid grid-cols-5 gap-4 pb-2 border-b border-border text-sm font-medium" style={{ color: 'var(--theme-stats)' }}>
-                    <div>Date</div>
-                    <div>WPM</div>
-                    <div>Accuracy</div>
-                    <div>Mode</div>
-                    <div>Time</div>
-                  </div>
+              {loading ? (
+                <div className="space-y-4">
+                  {Array.from({ length: 3 }).map((_, i) => (
+                    <div key={i} className="flex justify-between items-center p-4 rounded border" style={{ borderColor: 'var(--theme-stats)' }}>
+                      <div className="flex gap-4">
+                        <Skeleton className="h-4 w-16" />
+                        <Skeleton className="h-4 w-20" />
+                        <Skeleton className="h-4 w-24" />
+                      </div>
+                      <Skeleton className="h-4 w-20" />
+                    </div>
+                  ))}
+                </div>
+              ) : recentTests.length > 0 ? (
+                <div className="space-y-4">
                   {recentTests.map((test) => (
-                    <div key={test.id} className="grid grid-cols-5 gap-4 py-2 text-sm" style={{ color: 'var(--theme-typebox)' }}>
-                      <div>{formatDate(test.createdAt)}</div>
-                      <div className="font-medium">{test.wpm}</div>
-                      <div>{test.accuracy}%</div>
-                      <div>{test.settings.mode} {test.settings.duration}</div>
-                      <div>{Math.round(test.totalTime)}s</div>
+                    <div 
+                      key={test.id} 
+                      className="flex justify-between items-center p-4 rounded border"
+                      style={{ borderColor: 'var(--theme-stats)' }}
+                    >
+                      <div className="flex gap-6">
+                        <div>
+                          <span className="text-sm" style={{ color: 'var(--theme-stats)' }}>WPM: </span>
+                          <span className="font-semibold" style={{ color: 'var(--theme-title)' }}>{test.wpm}</span>
+                        </div>
+                        <div>
+                          <span className="text-sm" style={{ color: 'var(--theme-stats)' }}>Accuracy: </span>
+                          <span className="font-semibold" style={{ color: 'var(--theme-title)' }}>{test.accuracy}%</span>
+                        </div>
+                        <div>
+                          <span className="text-sm" style={{ color: 'var(--theme-stats)' }}>Mode: </span>
+                          <span className="font-semibold" style={{ color: 'var(--theme-title)' }}>
+                            {test.settings.mode} - {test.settings.duration}{test.settings.mode === 'time' ? 's' : ' words'}
+                          </span>
+                        </div>
+                      </div>
+                      <div className="text-sm" style={{ color: 'var(--theme-stats)' }}>
+                        {test.createdAt ? new Date(test.createdAt.toDate()).toLocaleDateString() : 'Unknown date'}
+                      </div>
                     </div>
                   ))}
                 </div>
               ) : (
-                <div className="text-center py-8" style={{ color: 'var(--theme-stats)' }}>
-                  <Keyboard className="mx-auto h-12 w-12 mb-4" />
-                  <p>Your test history will appear here once you complete some tests</p>
-                </div>
+                <p style={{ color: 'var(--theme-stats)' }}>
+                  {stats?.totalTests === 0 ? 'No tests completed yet. Start typing to see your progress!' : 'No recent tests found.'}
+                </p>
               )}
             </CardContent>
           </Card>

@@ -49,8 +49,8 @@ export const firestoreService = {
   // Save test result
   async saveTestResult(userId: string, result: TestResult) {
     try {
-      // Save the test result
-      const testData: FirestoreTestResult = {
+      // Save the test result with simpler structure
+      const testData = {
         userId,
         wpm: result.wpm,
         accuracy: result.accuracy,
@@ -120,11 +120,13 @@ export const firestoreService = {
   // Get user statistics
   async getUserStats(userId: string): Promise<UserStats | null> {
     try {
+      console.log('Fetching user stats for:', userId);
       const userRef = doc(db, 'users', userId);
       const userSnap = await getDoc(userRef);
       
       if (userSnap.exists()) {
         const data = userSnap.data();
+        console.log('User stats found:', data);
         return {
           totalTests: data.totalTests || 0,
           bestWPM: data.bestWPM || 0,
@@ -133,35 +135,59 @@ export const firestoreService = {
           totalTime: data.totalTime || 0,
           lastTestDate: data.lastTestDate?.toDate()
         };
+      } else {
+        console.log('No user document found');
+        return null;
       }
-      return null;
     } catch (error) {
       console.error('Error fetching user stats:', error);
       throw error;
     }
   },
 
-  // Get recent test results
+  // Get recent test results - simplified query
   async getRecentTests(userId: string, limitCount: number = 10): Promise<(FirestoreTestResult & { id: string })[]> {
     try {
+      console.log('Fetching recent tests for user:', userId);
+      
+      // Use only userId filter first, then sort in memory if needed
       const testsQuery = query(
         collection(db, 'testResults'),
         where('userId', '==', userId),
-        orderBy('createdAt', 'desc'),
-        limit(limitCount)
+        limit(limitCount * 2) // Get more to account for sorting
       );
       
       const querySnapshot = await getDocs(testsQuery);
       const tests: (FirestoreTestResult & { id: string })[] = [];
       
       querySnapshot.forEach((doc) => {
+        const data = doc.data();
         tests.push({
           id: doc.id,
-          ...doc.data() as FirestoreTestResult
+          userId: data.userId,
+          wpm: data.wpm,
+          accuracy: data.accuracy,
+          correct: data.correct,
+          incorrect: data.incorrect,
+          missed: data.missed,
+          totalTime: data.totalTime,
+          charCount: data.charCount,
+          settings: data.settings,
+          wpmHistory: data.wpmHistory,
+          createdAt: data.createdAt
         });
       });
       
-      return tests;
+      // Sort by createdAt in memory and limit
+      const sortedTests = tests
+        .sort((a, b) => {
+          if (!a.createdAt || !b.createdAt) return 0;
+          return b.createdAt.toMillis() - a.createdAt.toMillis();
+        })
+        .slice(0, limitCount);
+      
+      console.log('Recent tests found:', sortedTests.length);
+      return sortedTests;
     } catch (error) {
       console.error('Error fetching recent tests:', error);
       throw error;
