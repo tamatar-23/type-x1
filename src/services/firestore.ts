@@ -25,11 +25,12 @@ export const firestoreService = {
     photoURL?: string;
   }) {
     try {
+      console.log('Creating user profile for:', userId);
       const userRef = doc(db, 'users', userId);
       const userSnap = await getDoc(userRef);
       
       if (!userSnap.exists()) {
-        await setDoc(userRef, {
+        const profileData = {
           ...userData,
           createdAt: serverTimestamp(),
           totalTests: 0,
@@ -37,11 +38,18 @@ export const firestoreService = {
           averageWPM: 0,
           averageAccuracy: 0,
           totalTime: 0
-        });
+        };
+        
+        console.log('Creating new user document with data:', profileData);
+        await setDoc(userRef, profileData);
         console.log('User profile created successfully');
+      } else {
+        console.log('User profile already exists');
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error creating user profile:', error);
+      console.error('Error code:', error.code);
+      console.error('Error message:', error.message);
       throw error;
     }
   },
@@ -49,6 +57,8 @@ export const firestoreService = {
   // Save test result
   async saveTestResult(userId: string, result: TestResult) {
     try {
+      console.log('Saving test result for user:', userId);
+      
       // Save the test result with simpler structure
       const testData = {
         userId,
@@ -64,6 +74,7 @@ export const firestoreService = {
         createdAt: serverTimestamp()
       };
 
+      console.log('Test data to save:', testData);
       const testRef = await addDoc(collection(db, 'testResults'), testData);
       console.log('Test result saved with ID:', testRef.id);
 
@@ -71,8 +82,10 @@ export const firestoreService = {
       await this.updateUserStats(userId, result);
       
       return testRef.id;
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error saving test result:', error);
+      console.error('Error code:', error.code);
+      console.error('Error message:', error.message);
       throw error;
     }
   },
@@ -80,11 +93,13 @@ export const firestoreService = {
   // Update user statistics
   async updateUserStats(userId: string, newResult: TestResult) {
     try {
+      console.log('Updating user stats for:', userId);
       const userRef = doc(db, 'users', userId);
       const userSnap = await getDoc(userRef);
       
       if (userSnap.exists()) {
         const currentStats = userSnap.data() as UserStats;
+        console.log('Current user stats:', currentStats);
         
         const totalTests = (currentStats.totalTests || 0) + 1;
         const totalTime = (currentStats.totalTime || 0) + newResult.totalTime;
@@ -100,19 +115,26 @@ export const firestoreService = {
           ((currentStats.averageAccuracy || 0) * (totalTests - 1) + newResult.accuracy) / totalTests
         );
 
-        await updateDoc(userRef, {
+        const updatedStats = {
           totalTests,
           bestWPM,
           averageWPM,
           averageAccuracy,
           totalTime,
           lastTestDate: serverTimestamp()
-        });
+        };
         
+        console.log('Updating with stats:', updatedStats);
+        await updateDoc(userRef, updatedStats);
         console.log('User stats updated successfully');
+      } else {
+        console.error('User document does not exist when trying to update stats');
+        throw new Error('User document does not exist');
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error updating user stats:', error);
+      console.error('Error code:', error.code);
+      console.error('Error message:', error.message);
       throw error;
     }
   },
@@ -126,8 +148,9 @@ export const firestoreService = {
       
       if (userSnap.exists()) {
         const data = userSnap.data();
-        console.log('User stats found:', data);
-        return {
+        console.log('Raw user data from Firestore:', data);
+        
+        const stats = {
           totalTests: data.totalTests || 0,
           bestWPM: data.bestWPM || 0,
           averageWPM: data.averageWPM || 0,
@@ -135,33 +158,65 @@ export const firestoreService = {
           totalTime: data.totalTime || 0,
           lastTestDate: data.lastTestDate?.toDate()
         };
+        
+        console.log('Processed user stats:', stats);
+        return stats;
       } else {
-        console.log('No user document found');
-        return null;
+        console.log('No user document found, creating one...');
+        // Create a default user document if it doesn't exist
+        await this.createUserProfile(userId, {});
+        return {
+          totalTests: 0,
+          bestWPM: 0,
+          averageWPM: 0,
+          averageAccuracy: 0,
+          totalTime: 0
+        };
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error fetching user stats:', error);
+      console.error('Error code:', error.code);
+      console.error('Error message:', error.message);
       throw error;
     }
   },
 
-  // Get recent test results - simplified query
+  // Get recent test results - simplified approach
   async getRecentTests(userId: string, limitCount: number = 10): Promise<(FirestoreTestResult & { id: string })[]> {
     try {
-      console.log('Fetching recent tests for user:', userId);
+      console.log('Fetching recent tests for user:', userId, 'limit:', limitCount);
       
-      // Use only userId filter first, then sort in memory if needed
-      const testsQuery = query(
-        collection(db, 'testResults'),
-        where('userId', '==', userId),
-        limit(limitCount * 2) // Get more to account for sorting
-      );
+      // Simple query with just userId filter
+      let testsQuery;
+      
+      try {
+        // Try compound query first (requires index)
+        testsQuery = query(
+          collection(db, 'testResults'),
+          where('userId', '==', userId),
+          orderBy('createdAt', 'desc'),
+          limit(limitCount)
+        );
+        console.log('Using compound query with orderBy');
+      } catch (indexError) {
+        console.log('Compound query failed, falling back to simple query:', indexError);
+        // Fallback to simple query if index doesn't exist
+        testsQuery = query(
+          collection(db, 'testResults'),
+          where('userId', '==', userId),
+          limit(limitCount * 3) // Get more to sort in memory
+        );
+      }
       
       const querySnapshot = await getDocs(testsQuery);
+      console.log('Query executed, found documents:', querySnapshot.size);
+      
       const tests: (FirestoreTestResult & { id: string })[] = [];
       
       querySnapshot.forEach((doc) => {
         const data = doc.data();
+        console.log('Processing test document:', doc.id, data);
+        
         tests.push({
           id: doc.id,
           userId: data.userId,
@@ -178,7 +233,7 @@ export const firestoreService = {
         });
       });
       
-      // Sort by createdAt in memory and limit
+      // Sort by createdAt in memory if we used simple query
       const sortedTests = tests
         .sort((a, b) => {
           if (!a.createdAt || !b.createdAt) return 0;
@@ -186,10 +241,25 @@ export const firestoreService = {
         })
         .slice(0, limitCount);
       
-      console.log('Recent tests found:', sortedTests.length);
+      console.log('Final sorted tests:', sortedTests.length);
       return sortedTests;
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error fetching recent tests:', error);
+      console.error('Error code:', error.code);
+      console.error('Error message:', error.message);
+      
+      // If it's a permission error, provide more context
+      if (error.code === 'permission-denied') {
+        console.error('Permission denied - check Firestore security rules');
+        throw new Error('Permission denied: Check if you are logged in and Firestore rules allow access');
+      }
+      
+      // If it's an index error, provide helpful message
+      if (error.code === 'failed-precondition' || error.message.includes('index')) {
+        console.error('Missing index - this query requires a composite index');
+        throw new Error('Missing Firestore index: This query requires a composite index. Check the console for the index creation link.');
+      }
+      
       throw error;
     }
   }

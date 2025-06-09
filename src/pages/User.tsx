@@ -15,6 +15,7 @@ const User = () => {
   const [recentTests, setRecentTests] = useState<(FirestoreTestResult & { id: string })[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [detailedError, setDetailedError] = useState<any>(null);
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -31,23 +32,46 @@ const User = () => {
     if (!user) return;
 
     try {
-      console.log('Starting to fetch user data for:', user.uid);
+      console.log('=== Starting user data fetch ===');
+      console.log('User ID:', user.uid);
+      console.log('User email:', user.email);
+      
       setLoading(true);
       setError(null);
+      setDetailedError(null);
 
       // Fetch user stats
+      console.log('Fetching user stats...');
       const userStats = await firestoreService.getUserStats(user.uid);
-      console.log('Fetched user stats:', userStats);
+      console.log('User stats result:', userStats);
       setStats(userStats);
 
       // Fetch recent tests
+      console.log('Fetching recent tests...');
       const tests = await firestoreService.getRecentTests(user.uid, 5);
-      console.log('Fetched recent tests:', tests);
+      console.log('Recent tests result:', tests);
       setRecentTests(tests);
 
+      console.log('=== User data fetch completed successfully ===');
     } catch (error: any) {
-      console.error('Error fetching user data:', error);
-      setError(`Failed to load user data: ${error.message}`);
+      console.error('=== Error fetching user data ===');
+      console.error('Error object:', error);
+      console.error('Error code:', error.code);
+      console.error('Error message:', error.message);
+      console.error('Full error:', JSON.stringify(error, null, 2));
+      
+      setDetailedError(error);
+      
+      // Provide user-friendly error messages
+      if (error.code === 'permission-denied') {
+        setError('Permission denied: Please check your authentication status and try again.');
+      } else if (error.code === 'failed-precondition' || error.message.includes('index')) {
+        setError('Database index missing: The required Firestore indexes are not set up. Please contact support.');
+      } else if (error.code === 'unavailable') {
+        setError('Database temporarily unavailable: Please try again in a few moments.');
+      } else {
+        setError(`Failed to load user data: ${error.message}`);
+      }
     } finally {
       setLoading(false);
     }
@@ -138,19 +162,45 @@ const User = () => {
           {error && (
             <Card style={{ backgroundColor: 'rgba(239, 68, 68, 0.1)', borderColor: 'rgba(239, 68, 68, 0.3)' }}>
               <CardContent className="p-4">
-                <p style={{ color: 'var(--theme-title)' }}>{error}</p>
-                <Button 
-                  onClick={fetchUserData}
-                  className="mt-2"
-                  variant="outline"
-                  style={{ 
-                    borderColor: 'var(--theme-stats)',
-                    color: 'var(--theme-typebox)',
-                    backgroundColor: 'transparent'
-                  }}
-                >
-                  Try Again
-                </Button>
+                <p style={{ color: 'var(--theme-title)' }} className="font-semibold">{error}</p>
+                
+                {/* Detailed error for debugging */}
+                {detailedError && (
+                  <details className="mt-4">
+                    <summary className="cursor-pointer text-sm" style={{ color: 'var(--theme-stats)' }}>
+                      Technical Details (for debugging)
+                    </summary>
+                    <pre className="mt-2 text-xs p-2 bg-black/20 rounded overflow-auto" style={{ color: 'var(--theme-stats)' }}>
+                      {JSON.stringify(detailedError, null, 2)}
+                    </pre>
+                  </details>
+                )}
+                
+                <div className="flex gap-2 mt-4">
+                  <Button 
+                    onClick={fetchUserData}
+                    variant="outline"
+                    style={{ 
+                      borderColor: 'var(--theme-stats)',
+                      color: 'var(--theme-typebox)',
+                      backgroundColor: 'transparent'
+                    }}
+                  >
+                    Try Again
+                  </Button>
+                  
+                  <Button 
+                    onClick={() => console.log('Current user:', user)}
+                    variant="outline"
+                    style={{ 
+                      borderColor: 'var(--theme-stats)',
+                      color: 'var(--theme-typebox)',
+                      backgroundColor: 'transparent'
+                    }}
+                  >
+                    Log Debug Info
+                  </Button>
+                </div>
               </CardContent>
             </Card>
           )}
