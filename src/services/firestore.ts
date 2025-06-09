@@ -214,7 +214,20 @@ export const firestoreService = {
       const tests: (FirestoreTestResult & { id: string })[] = [];
       
       querySnapshot.forEach((doc) => {
-        const data = doc.data();
+        const data = doc.data() as {
+          userId: string;
+          wpm: number;
+          accuracy: number;
+          correct: number;
+          incorrect: number;
+          missed: number;
+          totalTime: number;
+          charCount: number;
+          settings: any;
+          wpmHistory: any[];
+          createdAt: any;
+        };
+        
         console.log('Processing test document:', doc.id, data);
         
         tests.push({
