@@ -1,3 +1,4 @@
+
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { TestSettings, TypingStats, Character, TestResult } from '@/types/typing';
 import { generateText } from '@/utils/words';
@@ -170,7 +171,7 @@ export function useTypingTest(settings: TestSettings) {
     setIsFinished(true);
     setIsActive(false);
     if (intervalRef.current) clearInterval(intervalRef.current);
-    if (wmpIntervalRef.current) clearInterval(wmpIntervalRef.current);
+    if (wpmIntervalRef.current) clearInterval(wpmIntervalRef.current);
 
     // Calculate final stats with current state
     const elapsed = startTime.current ? (Date.now() - startTime.current) / 1000 : 0;
@@ -182,10 +183,12 @@ export function useTypingTest(settings: TestSettings) {
     // Update stats state
     setStats(finalStats);
     
-    // Save to Firestore if user is authenticated
+    // Save to Firestore immediately after finishing
     if (user && !hasSaved.current) {
       try {
+        console.log('=== ATTEMPTING TO SAVE TEST RESULT ===');
         await saveTestResult(finalStats, wpmHistory);
+        console.log('=== TEST RESULT SAVED SUCCESSFULLY ===');
       } catch (error) {
         console.error('Failed to save test result:', error);
         // Don't block the user experience, but log the error
@@ -214,7 +217,7 @@ export function useTypingTest(settings: TestSettings) {
         }, 1000);
       }
 
-      wmpIntervalRef.current = setInterval(() => {
+      wpmIntervalRef.current = setInterval(() => {
         const elapsed = (Date.now() - startTime.current) / 1000;
         const currentStats = calculateStats(userInput, characters, elapsed);
         setWpmHistory(prev => [...prev, { time: elapsed, wpm: currentStats.wpm }]);
@@ -285,7 +288,7 @@ export function useTypingTest(settings: TestSettings) {
 
   const resetTest = useCallback(() => {
     if (intervalRef.current) clearInterval(intervalRef.current);
-    if (wmpIntervalRef.current) clearInterval(wmpIntervalRef.current);
+    if (wpmIntervalRef.current) clearInterval(wpmIntervalRef.current);
     hasSaved.current = false;
     initializeTest();
   }, [initializeTest]);
@@ -313,7 +316,7 @@ export function useTypingTest(settings: TestSettings) {
   useEffect(() => {
     return () => {
       if (intervalRef.current) clearInterval(intervalRef.current);
-      if (wmpIntervalRef.current) clearInterval(wmpIntervalRef.current);
+      if (wpmIntervalRef.current) clearInterval(wpmIntervalRef.current);
     };
   }, []);
 
