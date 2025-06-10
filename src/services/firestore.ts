@@ -1,4 +1,3 @@
-
 import { doc, setDoc, getDoc, updateDoc, collection, addDoc, query, where, orderBy, limit, getDocs, serverTimestamp } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { TestResult } from '@/types/typing';
@@ -57,35 +56,73 @@ export const firestoreService = {
   // Save test result
   async saveTestResult(userId: string, result: TestResult) {
     try {
+      console.log('=== FIRESTORE SAVE TEST RESULT ===');
       console.log('Saving test result for user:', userId);
+      console.log('Result data:', result);
       
-      // Save the test result with simpler structure
+      // Validate required fields
+      if (!userId) {
+        throw new Error('User ID is required');
+      }
+      
+      if (!result.wpm && result.wpm !== 0) {
+        throw new Error('WPM is required');
+      }
+      
+      if (!result.accuracy && result.accuracy !== 0) {
+        throw new Error('Accuracy is required');
+      }
+
+      // Create a clean data object for Firestore
       const testData = {
-        userId,
-        wpm: result.wpm,
-        accuracy: result.accuracy,
-        correct: result.correct,
-        incorrect: result.incorrect,
-        missed: result.missed,
-        totalTime: result.totalTime,
-        charCount: result.charCount,
-        settings: result.settings,
-        wpmHistory: result.wpmHistory,
+        userId: userId,
+        wpm: Number(result.wpm) || 0,
+        accuracy: Number(result.accuracy) || 0,
+        correct: Number(result.correct) || 0,
+        incorrect: Number(result.incorrect) || 0,
+        missed: Number(result.missed) || 0,
+        totalTime: Number(result.totalTime) || 0,
+        charCount: Number(result.charCount) || 0,
+        settings: {
+          mode: result.settings.mode,
+          duration: result.settings.duration,
+          difficulty: result.settings.difficulty
+        },
+        wpmHistory: result.wpmHistory || [],
         createdAt: serverTimestamp()
       };
 
-      console.log('Test data to save:', testData);
+      console.log('Clean test data for Firestore:', testData);
+
+      // Validate the data structure
+      if (!testData.userId || typeof testData.userId !== 'string') {
+        throw new Error('Invalid userId format');
+      }
+
       const testRef = await addDoc(collection(db, 'testResults'), testData);
-      console.log('Test result saved with ID:', testRef.id);
+      console.log('✅ Test result saved successfully with ID:', testRef.id);
 
       // Update user stats
       await this.updateUserStats(userId, result);
       
       return testRef.id;
     } catch (error: any) {
-      console.error('Error saving test result:', error);
-      console.error('Error code:', error.code);
-      console.error('Error message:', error.message);
+      console.error('❌ ERROR SAVING TEST RESULT');
+      console.error('Error object:', error);
+      console.error('Error code:', error?.code);
+      console.error('Error message:', error?.message);
+      console.error('User ID:', userId);
+      console.error('Result:', result);
+      
+      // Provide more specific error messages
+      if (error.code === 'permission-denied') {
+        throw new Error('Permission denied: Check Firestore security rules and user authentication');
+      } else if (error.code === 'invalid-argument') {
+        throw new Error('Invalid data format: Check that all required fields are present and valid');
+      } else if (error.code === 'unavailable') {
+        throw new Error('Firestore temporarily unavailable: Please try again');
+      }
+      
       throw error;
     }
   },

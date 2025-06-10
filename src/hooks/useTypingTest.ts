@@ -45,6 +45,7 @@ export function useTypingTest(settings: TestSettings) {
   const startTime = useRef<number>(0);
   const intervalRef = useRef<NodeJS.Timeout>();
   const wpmIntervalRef = useRef<NodeJS.Timeout>();
+  const hasSaved = useRef<boolean>(false);
 
   // Save settings whenever they change
   useEffect(() => {
@@ -71,6 +72,7 @@ export function useTypingTest(settings: TestSettings) {
       charCount: 0
     });
     setWpmHistory([]);
+    hasSaved.current = false;
   }, [settings]);
 
   const calculateStats = useCallback((input: string, chars: Character[], elapsedTime: number) => {
@@ -114,33 +116,91 @@ export function useTypingTest(settings: TestSettings) {
     };
   }, []);
 
+  const saveTestResult = useCallback(async (finalStats: TypingStats, finalWpmHistory: { time: number; wpm: number }[]) => {
+    if (!user || hasSaved.current) {
+      console.log('Not saving - user not authenticated or already saved');
+      return;
+    }
+
+    setIsSaving(true);
+    hasSaved.current = true;
+
+    try {
+      console.log('=== SAVING TEST RESULT ===');
+      console.log('User ID:', user.uid);
+      console.log('Final stats:', finalStats);
+      console.log('Settings:', settings);
+      console.log('WPM History:', finalWpmHistory);
+
+      const result: TestResult = {
+        id: Date.now().toString(),
+        timestamp: new Date(),
+        settings: { ...settings },
+        wpmHistory: [...finalWpmHistory],
+        ...finalStats
+      };
+
+      console.log('Complete result object:', result);
+
+      const savedId = await firestoreService.saveTestResult(user.uid, result);
+      console.log('Test result saved successfully with ID:', savedId);
+      
+      // Store in sessionStorage for immediate access on Results page
+      sessionStorage.setItem('lastResult', JSON.stringify(result));
+    } catch (error: any) {
+      console.error('=== ERROR SAVING TEST RESULT ===');
+      console.error('Error object:', error);
+      console.error('Error code:', error?.code);
+      console.error('Error message:', error?.message);
+      
+      // Reset hasSaved so user can try again
+      hasSaved.current = false;
+      
+      throw error;
+    } finally {
+      setIsSaving(false);
+    }
+  }, [user, settings]);
+
   const finishTest = useCallback(async () => {
-    console.log('Finishing test...');
+    console.log('=== FINISHING TEST ===');
+    console.log('Current stats:', stats);
+    console.log('Current WPM history:', wpmHistory);
+    
     setIsFinished(true);
     setIsActive(false);
     if (intervalRef.current) clearInterval(intervalRef.current);
-    if (wpmIntervalRef.current) clearInterval(wpmIntervalRef.current);
+    if (wmpIntervalRef.current) clearInterval(wmpIntervalRef.current);
 
-    // Save result to Firestore if user is authenticated
-    if (user && !isSaving) {
-      setIsSaving(true);
+    // Calculate final stats with current state
+    const elapsed = startTime.current ? (Date.now() - startTime.current) / 1000 : 0;
+    const finalStats = calculateStats(userInput, characters, elapsed);
+    
+    console.log('Final calculated stats:', finalStats);
+    console.log('Elapsed time:', elapsed);
+    
+    // Update stats state
+    setStats(finalStats);
+    
+    // Save to Firestore if user is authenticated
+    if (user && !hasSaved.current) {
       try {
-        const result = getResult();
-        await firestoreService.saveTestResult(user.uid, result);
-        console.log('Test result saved to Firestore');
+        await saveTestResult(finalStats, wpmHistory);
       } catch (error) {
         console.error('Failed to save test result:', error);
-        // Continue anyway - don't block the user experience
-      } finally {
-        setIsSaving(false);
+        // Don't block the user experience, but log the error
       }
+    } else {
+      console.log('Not saving - user not authenticated or already saved');
     }
-  }, [user, isSaving]);
+  }, [user, stats, wpmHistory, userInput, characters, calculateStats, saveTestResult]);
 
   const startTest = useCallback(() => {
     if (!isActive) {
+      console.log('=== STARTING TEST ===');
       setIsActive(true);
       startTime.current = Date.now();
+      hasSaved.current = false;
       
       if (settings.mode === 'time') {
         intervalRef.current = setInterval(() => {
@@ -154,7 +214,7 @@ export function useTypingTest(settings: TestSettings) {
         }, 1000);
       }
 
-      wpmIntervalRef.current = setInterval(() => {
+      wmpIntervalRef.current = setInterval(() => {
         const elapsed = (Date.now() - startTime.current) / 1000;
         const currentStats = calculateStats(userInput, characters, elapsed);
         setWpmHistory(prev => [...prev, { time: elapsed, wpm: currentStats.wpm }]);
@@ -225,7 +285,8 @@ export function useTypingTest(settings: TestSettings) {
 
   const resetTest = useCallback(() => {
     if (intervalRef.current) clearInterval(intervalRef.current);
-    if (wpmIntervalRef.current) clearInterval(wpmIntervalRef.current);
+    if (wmpIntervalRef.current) clearInterval(wmpIntervalRef.current);
+    hasSaved.current = false;
     initializeTest();
   }, [initializeTest]);
 
@@ -252,7 +313,7 @@ export function useTypingTest(settings: TestSettings) {
   useEffect(() => {
     return () => {
       if (intervalRef.current) clearInterval(intervalRef.current);
-      if (wpmIntervalRef.current) clearInterval(wpmIntervalRef.current);
+      if (wmpIntervalRef.current) clearInterval(wmpIntervalRef.current);
     };
   }, []);
 
